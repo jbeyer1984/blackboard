@@ -1,8 +1,6 @@
-<phpunit colors="true">
+<phpunit
     bootstrap="/var/www/blackboard/test/Bootstrap.php"
-    <testsuites>
-        <testsuite name="AppTests">
-            <directory>/var/www/blackboard/test</directory>
-        </testsuite>
-    </testsuites>
+    colors="true"
+>
+    
 </phpunit>

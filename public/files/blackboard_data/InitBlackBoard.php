@@ -8,43 +8,43 @@ if (!file_exists($path)) {
     $data = [
         'person'     => [
             [
-                'id'   => 0,
+                'id'   => 1,
                 'name' => 'Horst Schlämmer'
             ]
         ],
         'dance'      => [
             [
-                'id'   => 0,
+                'id'   => 1,
                 'name' => 'Salsa'
             ],
             [
-                'id'   => 1,
+                'id'   => 2,
                 'name' => 'Kizomba'
             ],
             [
-                'id'   => 2,
+                'id'   => 3,
                 'name' => 'Bachata'
             ]
         ],
         'experience' => [
             [
-                'id'   => 0,
+                'id'   => 1,
                 'name' => 'Totaler Anfänger'
             ],
             [
-                'id'   => 1,
+                'id'   => 2,
                 'name' => 'Anfänger'
             ],
             [
-                'id'   => 2,
+                'id'   => 3,
                 'name' => 'Fortgeschritten'
             ],
             [
-                'id'   => 3,
+                'id'   => 4,
                 'name' => 'Fast Profi'
             ],
             [
-                'id'   => 4,
+                'id'   => 5,
                 'name' => 'Profi'
             ]
         ]

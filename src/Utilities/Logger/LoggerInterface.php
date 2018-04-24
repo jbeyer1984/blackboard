@@ -3,13 +3,9 @@
 namespace src\Utilities\Logger;
 
 interface LoggerInterface{
-//    /**
-//     * @param $args
-//     * @return void
-//     */
-//    public function configure($args);
     
     /**
+     * @see MyLogger
      * @param $arg
      * @return void
      */

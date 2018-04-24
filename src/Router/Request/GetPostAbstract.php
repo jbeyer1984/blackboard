@@ -19,11 +19,7 @@ class GetPostAbstract
     public function get($index, $default = '')
     {
         if (empty($default) && !isset($this->data[$index])) {
-            $message = <<<TXT
-the parameter: {$index} in post does not exist 
-TXT;
-
-            throw new \Exception($message);
+            $this->getIdentifierExceptionNotFound($index);
         }
 
         if (!empty($default) && !isset($this->data[$index])) {
@@ -31,5 +27,18 @@ TXT;
         }
 
         return $this->data[$index];
+    }
+
+    /**
+     * @param $index
+     * @throws \Exception
+     */
+    private function getIdentifierExceptionNotFound($index)
+    {
+        $message = <<<TXT
+the parameter: {$index} in post does not exist 
+TXT;
+
+        throw new \Exception($message);
     }
 }

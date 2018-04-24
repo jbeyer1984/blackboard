@@ -20,17 +20,14 @@ class RouterTable
                 'url' => 'add',
                 'controller' => BlackboardController::class,
                 'action' => 'addAction',
-//                'post' => 'personal/dance',
                 'postParameter' => [
-                    'personal',
-                    'dance'
+                    'entry',
                 ]
             ],
             [
                 'url' => 'edit',
                 'controller' => BlackboardController::class,
                 'action' => 'editAction',
-//                'get' => 'id',
                 'getParameter' => [
                     'id'
                 ],
@@ -39,11 +36,8 @@ class RouterTable
                 'url' => 'store',
                 'controller' => BlackboardController::class,
                 'action' => 'storeAction',
-                //                'post' => 'id/personal/dance',
                 'postParameter' => [
-                    'id',
-                    'personal',
-                    'dance'
+                    'entry',
                 ]
             ],
             [
@@ -54,12 +48,6 @@ class RouterTable
                     'id',
                 ]
             ],
-//            [
-//                'url' => 'task1/user',
-//                'controller' => UserController::class,
-//                'action' => 'indexAction',
-//                'class' => User::class
-//            ]
         ];
             
         return $table;

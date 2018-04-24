@@ -34,13 +34,9 @@ class Router
     {
         $url = $_SERVER['REQUEST_URI'];
         
-//        $this->base->getLogger()->log($url, '$url');
-
         $afterIndexPhp = str_replace(
             [
-//                $docRoot,
                 '/' . 'test' . '/' . 'check',
-//                '/' . 'index.php' . '/'
                 '/' . 'blackboard.php' . '/'
             ]
             , '', $url
@@ -126,8 +122,6 @@ TXT;
         }
         
         return $args;
-
-//        $this->base->getLogger()->log($_POST, '$_POST');
     }
 
     /**

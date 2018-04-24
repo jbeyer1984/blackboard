@@ -3,9 +3,7 @@
 namespace src\App\Blackboard;
 
 use src\App\Blackboard\Configuration\EntryFile;
-use src\App\Blackboard\Entity\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
-use src\App\Blackboard\Entity\Transformer\Post\EntryCollectionTransformer AS PostEntryCollectionTransformer;
-use src\App\Blackboard\Entity\Transformer\Form\EntryCollectionTransformer AS FormEntryCollectionTransformer;
+use src\App\Blackboard\EntityNew\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
 use src\Core\_Core;
 use src\Core\DI\Service;
 use src\Core\DI\ServiceComponent;
@@ -30,7 +28,7 @@ class _Blackboard extends ServiceComponent
             . DIRECTORY_SEPARATOR . 'configuration_blackboard.json' 
         ]);
         $this->set(JsonEntryCollectionTransformer::class);
-        $this->set(PostEntryCollectionTransformer::class);
-        $this->set(FormEntryCollectionTransformer::class);
+        
+        $this->set(BlackboardBaseDataFromJson::class, [$this->getSingle(EntryFile::class)]);
     }
 }

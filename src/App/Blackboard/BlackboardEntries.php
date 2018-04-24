@@ -5,12 +5,11 @@ namespace src\App\Blackboard;
 
 
 use src\App\Blackboard\Configuration\EntryFile;
-use src\App\Blackboard\Entity\EntryCollection;
-use src\App\Blackboard\Entity\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
-use src\App\Blackboard\Entity\Transformer\Post\EntryCollectionTransformer AS PostEntryCollectionTransformer;
-use src\App\Blackboard\Entity\Transformer\Form\EntryCollectionTransformer AS FormEntryCollectionTransformer;
-use src\App\Blackboard\Form\AddEntryForm;
-use src\App\Blackboard\Form\EditEntryForm;
+use src\App\Blackboard\EntityNew\EntryEntity;
+use src\App\Blackboard\EntityNew\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
+use src\App\Blackboard\EntityNew\EntryCollection;
+use src\App\Blackboard\FormNew\AddEntryForm;
+use src\App\Blackboard\FormNew\EditEntryForm;
 use src\Core\DI\Service;
 use src\Utilities\Service\BaseUtilities;
 
@@ -32,16 +31,6 @@ class BlackboardEntries
     private $jsonTransformer;
 
     /**
-     * @var PostEntryCollectionTransformer
-     */
-    private $postTransformer;
-
-    /**
-     * @var FormEntryCollectionTransformer
-     */
-    private $formTransformer;
-
-    /**
      * BlackboardEntries constructor.
      * @param BaseUtilities $base
      */
@@ -56,8 +45,6 @@ class BlackboardEntries
     {
         $this->entryFile       = Service::get(_Blackboard::class)->getSingle(EntryFile::class);
         $this->jsonTransformer = Service::get(_Blackboard::class)->getSingle(JsonEntryCollectionTransformer::class);
-        $this->postTransformer = Service::get(_Blackboard::class)->getSingle(PostEntryCollectionTransformer::class);
-        $this->formTransformer = Service::get(_Blackboard::class)->getSingle(FormEntryCollectionTransformer::class);
     }
 
     /**
@@ -65,9 +52,7 @@ class BlackboardEntries
      */
     public function read()
     {
-        $data = $this->entryFile->read();
-        
-//        $this->base->getLogger()->log($data, '$data');
+        $data = $this->entryFile->readRelation();
         
         $entryCollection = $this->jsonTransformer->toObj($data);
         
@@ -75,17 +60,16 @@ class BlackboardEntries
     }
 
     /**
-     * @param $personalPost
-     * @param $dancePost
+     * @param EntryEntity $entryEntity
      */
-    public function create($personalPost, $dancePost)
+    public function create($entryEntity)
     {
-        $existingData = $this->entryFile->read();
-        $nextId = count($existingData);
-        $entryEntity = $this->postTransformer->toObj($nextId, $personalPost, $dancePost);
-        $existingData[$nextId] = $entryEntity->toArray();
+        $existingData = $this->entryFile->readRelation();
+        $newEntryEntity = $entryEntity->createActual();
+        
+        $existingData[$newEntryEntity->getId()] = $newEntryEntity->toArray();
 
-        $this->entryFile->store($existingData);
+        $this->entryFile->storeRelation($existingData);
     }
 
     /**
@@ -107,7 +91,7 @@ class BlackboardEntries
         $entryCollection = $this->read();
         $entryForm = null;
         $editEntryForm = null;
-        foreach ($entryCollection->getEntryArray() as $entryEntity) {
+        foreach ($entryCollection->getCollection() as $entryEntity) {
             if ($id == $entryEntity->getId()) {
                 $editEntryForm = new EditEntryForm($entryEntity);
             }
@@ -117,36 +101,27 @@ class BlackboardEntries
     }
 
     /**
-     * @param int $id
-     * @param array $personalPost
-     * @param array $dancePost
+     * @param EntryEntity $entryEntity
      */
-    public function store($id, $personalPost, $dancePost)
+    public function store($entryEntity)
     {
-        $dump = print_r($_POST, true);
-        error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $_POST ***' . PHP_EOL . " = " . $dump . PHP_EOL);
-        
-        $existingData = $this->entryFile->read();
-        $entryEntity = $this->postTransformer->toObj($id, $personalPost, $dancePost);
-        $entryEntityToArray = $entryEntity->toArray();
-        $existingData[$id] = $entryEntityToArray;
+        $existingData = $this->entryFile->readRelation();
 
-        $this->entryFile->store($existingData);
+        $existingData[$entryEntity->getId()] = $entryEntity->toArray();
+
+        $this->entryFile->storeRelation($existingData);
     }
-
+    
     /**
      * @param int $id
      */
     public function delete($id)
     {
-        $existingData = $this->entryFile->read();
+        $existingData = $this->entryFile->readRelation();
         if (isset($existingData[$id])) {
             unset($existingData[$id]);
         }
         
-        
-        $this->base->getLogger()->log($existingData, '$existingData');
-        
-        $this->entryFile->store($existingData);
+        $this->entryFile->storeRelation($existingData);
     }
 }

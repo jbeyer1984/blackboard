@@ -26,7 +26,10 @@ class Blackboard
         $blackboardEntries = new BlackboardEntries($this->base);
         $entryCollection = $blackboardEntries->read();
         $form = $blackboardEntries->getAddForm();
-        $formData = $form->getFormData();
+        $html = $form->getRenderedForm();
+        // empty entry
+        
+        $formData = $html;
         
         $viewPath = 'blackboard/show.php';
         $this->base->getTemplate()->getView($viewPath, [
@@ -37,14 +40,12 @@ class Blackboard
 
     public function add(Request $request)
     {
-        $personal = $request->getPost()->get('personal');
-        $dance = $request->getPost()->get('dance');
-        
-        
-        $this->base->getLogger()->log($dance, '$dance');
-
         $blackboardEntries = new BlackboardEntries($this->base);
-        $blackboardEntries->create($personal, $dance);
+        $form = $blackboardEntries->getAddForm();
+        $formCreator = $form->getFormCreator();
+        $formCreator->handleRequest($request);
+        $entryEntity = $formCreator->getData();
+        $blackboardEntries->create($entryEntity);
         
         $this->base->getRouter()->redirect('/blackboard.php/show');
     }
@@ -58,24 +59,29 @@ class Blackboard
         $id = $request->getGet()->get('id');
         $blackboardEntries = new BlackboardEntries($this->base);
         $form = $blackboardEntries->getEditForm($id);
-        $formData = $form->getFormData();
+        $html = $form->getRenderedForm();
+        
+        $formData = $html;
         
         $viewPath = 'blackboard/edit.php';
         $this->base->getTemplate()->getView($viewPath, [
+            'entryFormId' => $form->getFormCreator()->getData()->getId(),
             'formData' => $formData,
         ]);
     }
 
     public function store(Request $request)
     {
-        $id = $request->getPost()->get('id');
-        $personal = $request->getPost()->get('personal');
-        $dance = $request->getPost()->get('dance');
-
+        $entry = $request->getPost()->get('entry');
+        $entryId = $entry['id'];
         $blackboardEntries = new BlackboardEntries($this->base);
-        $blackboardEntries->store($id, $personal, $dance);
+        $form = $blackboardEntries->getEditForm($entryId);
+        $formCreator = $form->getFormCreator();
+        $formCreator->handleRequest($request);
+        $entryEntity = $formCreator->getData();
+        $blackboardEntries->store($entryEntity);
         
-        $this->base->getRouter()->redirect('/blackboard.php/edit/' . $id);
+        $this->base->getRouter()->redirect('/blackboard.php/edit/' . $entryId);
     }
 
     /**

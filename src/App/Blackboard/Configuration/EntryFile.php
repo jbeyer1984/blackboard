@@ -26,7 +26,12 @@ class EntryFile
     /**
      * @var string
      */
-    private $entryFileJson;
+    private $entryFileJsonRelation;
+
+    /**
+     * @var string
+     */
+    private $entryFileJsonData;
 
     /**
      * EntryFile constructor.
@@ -43,18 +48,29 @@ class EntryFile
 
     protected function init()
     {
-        $configurationData = json_decode(file_get_contents($this->configurationFile), true);
-        $this->entryFileJson = ROOT_PATH . DIRECTORY_SEPARATOR . $configurationData['entryFileJson'];
+        $configurationData           = json_decode(file_get_contents($this->configurationFile), true);
+        $this->entryFileJsonRelation = ROOT_PATH . DIRECTORY_SEPARATOR . $configurationData['entryFileJsonRelation'];
+        $this->entryFileJsonData     = ROOT_PATH . DIRECTORY_SEPARATOR . $configurationData['entryFileJsonData'];
+    }
+
+    public function readData()
+    {
+        $data = [];
+        if (file_exists($this->entryFileJsonData)) {
+            $data = json_decode(file_get_contents($this->entryFileJsonData), true);
+        }
+
+        return $data;
     }
 
     /**
      * return array
      */
-    public function read()
+    public function readRelation()
     {
         $data = [];
-        if (file_exists($this->entryFileJson)) {
-            $data = json_decode(file_get_contents($this->entryFileJson), true);
+        if (file_exists($this->entryFileJsonRelation)) {
+            $data = json_decode(file_get_contents($this->entryFileJsonRelation), true);
         }
         
         return $data;
@@ -63,9 +79,17 @@ class EntryFile
     /**
      * @param array $data
      */
-    public function store($data)
+    public function storeRelation($data)
     {
-        file_put_contents($this->entryFileJson, json_encode($data, true));
+        file_put_contents($this->entryFileJsonRelation, json_encode($data, true));
+    }
+
+    /**
+     * @param array $data
+     */
+    public function storeData($data)
+    {
+        file_put_contents($this->entryFileJsonData, json_encode($data, true));
     }
 }
 

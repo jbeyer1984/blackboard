@@ -123,6 +123,23 @@ TXT;
     }
 
     /**
+     * @param string $identifier
+     * @param array $arguments
+     * @return ServiceComponent
+     */
+    public function overwrite($identifier, $arguments = [])
+    {
+        if (isset($this->components[$identifier])) {
+            $this->components[$identifier] = [
+                'class' => $identifier,
+                'arguments' => $arguments
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
      * @param $identifier
      * @param $obj
      */
@@ -139,7 +156,7 @@ TXT;
      */
     private function injectError($identifier)
     {
-        if (isset($this->components[$identifier])) {
+        if (!isset($this->components[$identifier])) {
             $errorMessage = <<<TXT
 you want to use src\inject and overwrite existing entry: $identifier
 TXT;

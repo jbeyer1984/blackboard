@@ -1,3 +1,4 @@
 {
-    "entryFileJson": "public/files/blackboard_entries/entries.json"
+    "entryFileJsonData": "public/files/blackboard_data/blackboard_data.json",
+    "entryFileJsonRelation": "public/files/blackboard_entries/entries.json"
 }

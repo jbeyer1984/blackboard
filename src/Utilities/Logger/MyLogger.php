@@ -6,14 +6,15 @@ namespace src\Utilities\Logger;
 
 class MyLogger implements LoggerInterface
 {
-//    /**
-//     * @param $args
-//     * @return void
-//     */
-//    public function configure($args)
-//    {
-//        
-//    }
+    /**
+     * @var string
+     */
+    private $path;
+
+    public function __construct($path = '')
+    {
+        $this->path = $path;
+    }
 
     /**
      * @param mixed $arg
@@ -24,19 +25,9 @@ class MyLogger implements LoggerInterface
         $e = new \Exception();
         $trace = $e->getTrace();
         $entry = array_shift($trace);
-//        if (0 < count($trace)) {
-//            $entry = array_shift($trace);
-//        }
 
         $dump = print_r($arg, true);
         
-//        $dump = print_r($entry, true);
-//        error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $entry ***' . PHP_EOL . " = " . $dump . PHP_EOL);
-//        $strToFind = 'htdocs/test/check/';
-//        $strToFind = str_replace('/', DIRECTORY_SEPARATOR, $strToFind);
-//        $htdocsPos = stripos($entry['file'], $strToFind);
-//        $file = substr($entry['file'], $htdocsPos + strlen($strToFind));
-//        $file = substr($entry['file'], $htdocsPos + strlen($strToFind));
         $file = str_replace(ROOT_PATH . DIRECTORY_SEPARATOR, '', $entry['file']);
         $file = str_replace(DIRECTORY_SEPARATOR, '/', $file);
 //        $file = $entry['file'];
@@ -47,6 +38,10 @@ class MyLogger implements LoggerInterface
 *** {$identifier} ***
  = $dump
 TXT;
-        error_log($txt);
+        if (empty($this->path)) {
+            error_log($txt);
+        } else {
+            error_log($txt, 3, $this->path);
+        }
     }
 }
