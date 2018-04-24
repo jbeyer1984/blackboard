@@ -3,7 +3,7 @@
 namespace src\App\Blackboard;
 
 use src\App\Blackboard\Configuration\EntryFile;
-use src\App\Blackboard\EntityNew\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
+use src\App\Blackboard\Entity\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
 use src\Core\_Core;
 use src\Core\DI\Service;
 use src\Core\DI\ServiceComponent;
@@ -22,7 +22,7 @@ class _Blackboard extends ServiceComponent
         $this->set(EntryFile::class, [
             $baseUtilities,
             SRC_PATH // path to configuration file
-            . DIRECTORY_SEPARATOR . 'App' 
+            . DIRECTORY_SEPARATOR . 'App'
             . DIRECTORY_SEPARATOR . 'Blackboard' 
             . DIRECTORY_SEPARATOR . 'Configuration'
             . DIRECTORY_SEPARATOR . 'configuration_blackboard.json' 

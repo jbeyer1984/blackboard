@@ -3,10 +3,10 @@
 namespace src\App\Blackboard;
 
 use src\App\Blackboard\Configuration\EntryFile;
-use src\App\Blackboard\EntityNew\DanceEntity;
-use src\App\Blackboard\EntityNew\DanceEntityCollection;
-use src\App\Blackboard\EntityNew\ExperienceEntity;
-use src\App\Blackboard\EntityNew\ExperienceEntityCollection;
+use src\App\Blackboard\Entity\DanceEntity;
+use src\App\Blackboard\Entity\DanceEntityCollection;
+use src\App\Blackboard\Entity\ExperienceEntity;
+use src\App\Blackboard\Entity\ExperienceEntityCollection;
 
 class BlackboardBaseDataFromJson
 {

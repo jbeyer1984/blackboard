@@ -5,11 +5,11 @@ namespace src\App\Blackboard;
 
 
 use src\App\Blackboard\Configuration\EntryFile;
-use src\App\Blackboard\EntityNew\EntryEntity;
-use src\App\Blackboard\EntityNew\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
-use src\App\Blackboard\EntityNew\EntryCollection;
-use src\App\Blackboard\FormNew\AddEntryForm;
-use src\App\Blackboard\FormNew\EditEntryForm;
+use src\App\Blackboard\Entity\EntryEntity;
+use src\App\Blackboard\Entity\Transformer\Json\EntryCollectionTransformer AS JsonEntryCollectionTransformer;
+use src\App\Blackboard\Entity\EntryCollection;
+use src\App\Blackboard\Form\AddEntryForm;
+use src\App\Blackboard\Form\EditEntryForm;
 use src\Core\DI\Service;
 use src\Utilities\Service\BaseUtilities;
 

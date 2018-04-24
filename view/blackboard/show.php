@@ -24,7 +24,7 @@
             <br>
             <div class="spacer"></div>
             <div id="entries">
-                <?php use src\App\Blackboard\EntityNew\EntryCollection;
+                <?php use src\App\Blackboard\Entity\EntryCollection;
                 /** @var EntryCollection $entries */
                 $entries = $arr['entries'];
                 foreach ($entries->getCollection() as $entry):
