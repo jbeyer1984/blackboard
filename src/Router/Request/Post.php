@@ -4,7 +4,7 @@
 namespace src\Router\Request;
 
 
-class Post extends GetPostAbstract
+class Post extends GetPostBase
 {
     public function getAllParams()
     {

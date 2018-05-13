@@ -11,11 +11,20 @@
     <div id="page_wrapper">
         <div id="page_content">
             <?php
-            $entryId = $arr['entryFormId'];
+
+            use src\Core\Utitlity\UrlHelper;
+
+            $entryId   = $arr['entryFormId'];
             $entryForm = $arr['formData'];
             ?>
             Editiere den Block Eintrag.
-            <span class="back_to_show spacer_horizontal"><a class="delete_entry" href="/blackboard.php/delete/<?= $entryId ?>">löschen</a></span>
+            <?php
+            $deleteUrl = UrlHelper::getCreatedUrl(
+                '/blackboard.php/delete',
+                ['id' => $entryId,]
+            );
+            ?>
+            <span class="back_to_show spacer_horizontal"><a class="delete_entry" href="<?= $deleteUrl ?>">löschen</a></span>
             <br>
             <br>
             <div class="form_wrapper">

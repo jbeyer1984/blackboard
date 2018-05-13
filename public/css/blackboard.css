@@ -20,6 +20,9 @@ form > .entry {
 form > .entry > div {
   margin-bottom: 10px;
 }
+form > .entry > div label {
+  display: flex;
+}
 form > .entry .back_to_show {
   margin-left: 50px;
 }

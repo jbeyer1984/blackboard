@@ -1,25 +1,25 @@
 <?php
 
 
-namespace src\Core\Form\Iterator;
+namespace test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Iterator;
 
 
 use IteratorAggregate;
-use test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Entity\DanceEntityCollection;
+use test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Entity\ExperienceEntityCollection;
 use Traversable;
 
-class DanceEntityCollectionIterator implements IteratorAggregate
+class ExperienceEntityCollectionIterator implements IteratorAggregate
 {
     /**
-     * @var DanceEntityCollection
+     * @var ExperienceEntityCollection
      */
     private $data;
 
     /**
-     * DanceEntityCollectionIterator constructor.
-     * @param DanceEntityCollection $data
+     * ExperienceEntityCollectionIterator constructor.
+     * @param ExperienceEntityCollection $data
      */
-    public function __construct(DanceEntityCollection $data)
+    public function __construct(ExperienceEntityCollection $data)
     {
         $this->data = $data;
     }

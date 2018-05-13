@@ -18,15 +18,30 @@ class PersonEntity implements ToArrayInterface
     private $name;
 
     /**
+     * @var string
+     */
+    private $number;
+
+    /**
+     * @var string
+     */
+    private $optional;
+
+    /**
      * PersonEntity constructor.
      * @param int $id
      * @param string $name
+     * @param string $number
+     * @param string $optional
      */
-    public function __construct($id, $name)
+    public function __construct($id, $name, $number, $optional)
     {
-        $this->id   = $id;
-        $this->name = $name;
+        $this->id       = $id;
+        $this->name     = $name;
+        $this->number   = $number;
+        $this->optional = $optional;
     }
+
 
     /**
      * @return int
@@ -35,17 +50,6 @@ class PersonEntity implements ToArrayInterface
     {
         return $this->id;
     }
-
-//    /**
-//     * @param int $id
-//     * @return PersonEntity
-//     */
-//    public function setId($id)
-//    {
-//        $this->id = $id;
-//
-//        return $this;
-//    }
 
     /**
      * @return string
@@ -66,6 +70,43 @@ class PersonEntity implements ToArrayInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getNumber()
+    {
+        return $this->number;
+    }
+
+    /**
+     * @param string $number
+     * @return PersonEntity
+     */
+    public function setNumber($number)
+    {
+        $this->number = $number;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOptional()
+    {
+        return $this->optional;
+    }
+
+    /**
+     * @param string $optional
+     * @return PersonEntity
+     */
+    public function setOptional($optional)
+    {
+        $this->optional = $optional;
+
+        return $this;
+    }
 
     /**
      * @return array
@@ -74,7 +115,9 @@ class PersonEntity implements ToArrayInterface
     {
         return [
             'id' => $this->id,
-            'name' => $this->name
+            'name' => $this->name,
+            'number' => $this->number,
+            'optional' => $this->optional,
         ];
     }
 }

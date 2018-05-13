@@ -3,9 +3,7 @@
 
 namespace src\App\Blackboard\Entity;
 
-use src\App\Blackboard\_Blackboard;
-use src\App\Blackboard\Configuration\EntryFile;
-use src\Core\DI\Service;
+use src\App\Blackboard\Factory\EntryFileFactory;
 use src\Core\Entity\ToArrayInterface;
 
 class EntryEntity implements ToArrayInterface
@@ -50,7 +48,7 @@ class EntryEntity implements ToArrayInterface
      */
     public function createActual()
     {
-        $entryFile = Service::get(_Blackboard::class)->getSingle(EntryFile::class);
+        $entryFile = EntryFileFactory::getCreatedDefaultEntryFile();
         $existingData = $entryFile->readRelation();
         $lastEntry = array_pop($existingData);
         $entryId = $lastEntry['id'];

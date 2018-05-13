@@ -16,16 +16,28 @@ class Request
      */
     private $post;
 
-    public function __construct()
+    /**
+     * Request constructor.
+     * @param Get $get
+     * @param Post $post
+     */
+    public function __construct(Get $get, Post $post)
     {
-        $this->init();
+        $this->get  = $get;
+        $this->post = $post;
     }
 
-    protected function init()
-    {
-        $this->get = new Get();
-        $this->post = new Post();
-    }
+
+//    public function __construct()
+//    {
+//        $this->init();
+//    }
+
+//    protected function init()
+//    {
+//        $this->get = new Get($_GET);
+//        $this->post = new Post($_POST);
+//    }
 
     /**
      * @return Get

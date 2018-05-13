@@ -2,8 +2,6 @@
 
 namespace src\App\Blackboard\Configuration;
 
-use src\Utilities\Service\BaseUtilities;
-
 /**
  * this class read and store data
  * the configuration file is set in the Service _Blackboard
@@ -12,12 +10,6 @@ use src\Utilities\Service\BaseUtilities;
  */
 class EntryFile
 {
-    /**
-     * @see _Blackboard
-     * @var BaseUtilities
-     */
-    private $base;
-    
     /**
      * @var string
      */
@@ -35,15 +27,15 @@ class EntryFile
 
     /**
      * EntryFile constructor.
-     * @param BaseUtilities $base
-     * @param $configurationFile
+     * @param string $configurationFile
+     * @param string $entryFileJsonRelation
+     * @param string $entryFileJsonData
      */
-    public function __construct(BaseUtilities $base, $configurationFile)
+    public function __construct($configurationFile, $entryFileJsonRelation, $entryFileJsonData)
     {
-        $this->base = $base;
-        $this->configurationFile = $configurationFile;
-        
-        $this->init();
+        $this->configurationFile     = $configurationFile;
+        $this->entryFileJsonRelation = $entryFileJsonRelation;
+        $this->entryFileJsonData     = $entryFileJsonData;
     }
 
     protected function init()

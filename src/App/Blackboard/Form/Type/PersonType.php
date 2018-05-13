@@ -16,6 +16,10 @@ class PersonType extends AbstractType
         $builder->add('id', 'input');
         $builder->add('Name', 'label_text');
         $builder->add('name', 'text');
+        $builder->add('Number', 'label_text');
+        $builder->add('number', 'text');
+        $builder->add('Sonstiges', 'label_text');
+        $builder->add('optional', 'text');
     }
 
     public function resolve(ResolverInterface $resolver)

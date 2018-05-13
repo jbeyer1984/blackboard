@@ -4,10 +4,10 @@
 namespace src\Router\Request;
 
 
-class Get extends GetPostAbstract
+class Get extends GetPostBase
 {
-    public function getAllParams()
-    {
-        return $_GET;
-    }
+//    public function getAllParams()
+//    {
+//        return $_GET;
+//    }
 }

@@ -2,6 +2,7 @@
 
 namespace src\App\Blackboard;
 
+use src\Core\Utitlity\UrlHelper;
 use src\Router\Request\Request;
 use src\Utilities\Service\BaseUtilities;
 
@@ -13,19 +14,36 @@ class Blackboard
     private $base;
 
     /**
+     * @var BlackboardEntries
+     */
+    private $blackboardEntries;
+
+    /**
      * Blackboard constructor.
      * @param BaseUtilities $base
+     * @param BlackboardEntries $blackboardEntries
      */
-    public function __construct(BaseUtilities $base)
+    public function __construct(BaseUtilities $base, BlackboardEntries $blackboardEntries)
     {
-        $this->base = $base;
+        $this->base              = $base;
+        $this->blackboardEntries = $blackboardEntries;
     }
+
+
+
+//    /**
+//     * Blackboard constructor.
+//     * @param BaseUtilities $base
+//     */
+//    public function __construct(BaseUtilities $base)
+//    {
+//        $this->base = $base;
+//    }
 
     public function show()
     {   
-        $blackboardEntries = new BlackboardEntries($this->base);
-        $entryCollection = $blackboardEntries->read();
-        $form = $blackboardEntries->getAddForm();
+        $entryCollection = $this->blackboardEntries->read();
+        $form = $this->blackboardEntries->getAddForm();
         $html = $form->getRenderedForm();
         // empty entry
         
@@ -40,25 +58,22 @@ class Blackboard
 
     public function add(Request $request)
     {
-        $blackboardEntries = new BlackboardEntries($this->base);
-        $form = $blackboardEntries->getAddForm();
+        $form = $this->blackboardEntries->getAddForm();
         $formCreator = $form->getFormCreator();
         $formCreator->handleRequest($request);
         $entryEntity = $formCreator->getData();
-        $blackboardEntries->create($entryEntity);
+        $this->blackboardEntries->create($entryEntity);
         
         $this->base->getRouter()->redirect('/blackboard.php/show');
     }
 
     /**
      * @param Request $request
-     * @throws \Exception
      */
     public function edit(Request $request)
     {
         $id = $request->getGet()->get('id');
-        $blackboardEntries = new BlackboardEntries($this->base);
-        $form = $blackboardEntries->getEditForm($id);
+        $form = $this->blackboardEntries->getEditForm($id);
         $html = $form->getRenderedForm();
         
         $formData = $html;
@@ -72,16 +87,21 @@ class Blackboard
 
     public function store(Request $request)
     {
+        $dump = print_r($_POST, true);
+        error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $_POST ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
+        
         $entry = $request->getPost()->get('entry');
         $entryId = $entry['id'];
-        $blackboardEntries = new BlackboardEntries($this->base);
-        $form = $blackboardEntries->getEditForm($entryId);
+        $form = $this->blackboardEntries->getEditForm($entryId);
         $formCreator = $form->getFormCreator();
         $formCreator->handleRequest($request);
         $entryEntity = $formCreator->getData();
-        $blackboardEntries->store($entryEntity);
-        
-        $this->base->getRouter()->redirect('/blackboard.php/edit/' . $entryId);
+        $this->blackboardEntries->store($entryEntity);
+        $editUrl = UrlHelper::getCreatedUrl(
+            '/blackboard.php/edit',
+            ['id' => $entryId]
+        );
+        $this->base->getRouter()->redirect($editUrl);
     }
 
     /**
@@ -90,8 +110,7 @@ class Blackboard
     public function delete(Request $request)
     {
         $id = $request->getGet()->get('id');
-        $blackboardEntries = new BlackboardEntries($this->base);
-        $blackboardEntries->delete($id);
+        $this->blackboardEntries->delete($id);
 
         $this->base->getRouter()->redirect('/blackboard.php/show');
     }

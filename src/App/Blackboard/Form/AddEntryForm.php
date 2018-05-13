@@ -28,7 +28,7 @@ class AddEntryForm
     protected function init()
     {
         $now = (new \DateTime('NOW'))->format('Y-m-d H:i:s');
-        $entryEntity = new EntryEntity(0, $now, new PersonEntity(0, ''), new DanceEntityCollection());
+        $entryEntity = new EntryEntity(0, $now, new PersonEntity(0, '', '', ''), new DanceEntityCollection());
         $formCreator = new FormCreator(new EntryType(), $entryEntity);
         
         $this->formCreator = $formCreator;

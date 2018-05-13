@@ -4,22 +4,21 @@
 namespace src\App\Blackboard\Form\Transformer\Post;
 
 
-use src\App\Blackboard\_Blackboard;
 use src\App\Blackboard\Entity\ExperienceEntity;
 use src\App\Blackboard\Entity\ExperienceEntityCollection;
+use src\Core\Entity\TransformerInterface;
 use src\Core\Form\Components\Provider\ProviderDataIterator;
 use src\Core\Form\Components\Request\RequestDataBind;
-use src\Core\DI\Service;
-use src\App\Blackboard\BlackboardBaseDataFromJson;
+use test\App\Blackboard\FormNew\SymfonyApproach\Factory\BlackboardBaseDataFactory;
 
-class ExperienceEntityCollectionTransformer
+class ExperienceEntityCollectionTransformer implements TransformerInterface
 {
     /**
      * @param mixed $requestVal
      * @param RequestDataBind $bind
      * @return ExperienceEntityCollection
      */
-    public function toObj($requestVal, RequestDataBind $bind)
+    public function toObj($requestVal, RequestDataBind $bind = null)
     {
         $experienceEntityCollection = new ExperienceEntityCollection();
         
@@ -27,10 +26,9 @@ class ExperienceEntityCollectionTransformer
         if ($data instanceof ProviderDataIterator) {
             $dataToChange = $data->getData();
             if ($dataToChange instanceof ExperienceEntityCollection) {
-
+                $blackboardBaseData = BlackboardBaseDataFactory::getBlackboardBaseDataFromJson();
                 /** @var ExperienceEntityCollection $allExperienceEntityCollection */
-                $allExperienceEntityCollection = Service::get(_Blackboard::class)
-                    ->getSingle(BlackboardBaseDataFromJson::class)
+                $allExperienceEntityCollection = $blackboardBaseData
                     ->getExperienceEntityCollection()
                 ;
 

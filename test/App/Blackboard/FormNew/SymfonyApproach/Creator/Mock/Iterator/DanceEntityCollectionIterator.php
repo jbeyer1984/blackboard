@@ -1,7 +1,7 @@
 <?php
 
 
-namespace src\App\Blackboard\FormNew\SymfonyApproach\Iterator;
+namespace test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Iterator;
 
 
 use IteratorAggregate;

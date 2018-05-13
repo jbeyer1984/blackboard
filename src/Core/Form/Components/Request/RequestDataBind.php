@@ -4,6 +4,7 @@
 namespace src\Core\Form\Components\Request;
 
 
+use src\Core\Entity\TransformerInterface;
 use src\Core\Form\Builder;
 
 class RequestDataBind
@@ -29,7 +30,7 @@ class RequestDataBind
     private $builder;
 
     /**
-     * @var mixed
+     * @var TransformerInterface
      */
     private $transformer;
 
@@ -88,7 +89,7 @@ class RequestDataBind
     }
 
     /**
-     * @return mixed
+     * @return TransformerInterface
      */
     public function getTransformer()
     {

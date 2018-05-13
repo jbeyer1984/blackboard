@@ -25,19 +25,32 @@
             <div class="spacer"></div>
             <div id="entries">
                 <?php use src\App\Blackboard\Entity\EntryCollection;
+                use src\Core\Utitlity\UrlHelper;
+
                 /** @var EntryCollection $entries */
                 $entries = $arr['entries'];
-                foreach ($entries->getCollection() as $entry):
-                ?>
+                foreach ($entries->getCollection() as $entry): ?>
                 <div class="entry">
                     <input type="hidden" name="entry_id" value="<?= $entry->getId() ?>"/>
                     <div id="time">
                         <span><?= $entry->getTime() ?></span>
-                        <span><a class="edit_entry" href="/blackboard.php/edit/<?= $entry->getId() ?>">edit</a></span>
+                        <?php
+                        $editUrl = UrlHelper::getCreatedUrl(
+                            '/blackboard.php/edit',
+                             ['id' => $entry->getId()]
+                        );
+                        ?>
+                        <span><a class="edit_entry" href="<?= $editUrl ?>">edit</a></span>
                     </div>
                     <div id="person">
                         Person:
                         <span class="name"><?= $entry->getPerson()->getName() ?></span>
+                        <br>
+                        Number:
+                        <span class="name"><?= $entry->getPerson()->getNumber() ?></span>
+                        <br>
+                        Sonstiges:
+                        <span class="name"><?= $entry->getPerson()->getOptional() ?></span>
                     </div>
                     <div id="dance">
                         <?php foreach ($entry->getDanceCollection()->getCollection() as $dance): ?>

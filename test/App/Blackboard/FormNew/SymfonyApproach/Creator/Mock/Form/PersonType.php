@@ -1,20 +1,19 @@
 <?php
 
 
-namespace src\App\Blackboard\FormNew\Type;
+namespace test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Form;
 
 
-use src\App\Blackboard\EntityNew\PersonEntity;
-use src\App\Blackboard\FormNew\SymfonyApproach\AbstractType;
-use src\App\Blackboard\FormNew\SymfonyApproach\BuilderInterface;
-use src\App\Blackboard\FormNew\SymfonyApproach\ResolverInterface;
+use src\Core\Form\AbstractType;
+use src\Core\Form\BuilderInterface;
+use src\Core\Form\ResolverInterface;
+use test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Entity\PersonEntity;
 
 class PersonType extends AbstractType
 {
     public function build(BuilderInterface $builder)
     {
         $builder->add('id', 'input');
-        $builder->add('Name', 'label_text');
         $builder->add('name', 'text');
     }
 

@@ -4,25 +4,34 @@
 namespace src\Router\Request;
 
 
-class GetPostAbstract
+class GetPostBase
 {
     /**
      * @var array
      */
     private $data;
 
-    public function add($index, $value)
+    /**
+     * GetPostAbstract constructor.
+     * @param array $data
+     */
+    public function __construct(array $data)
     {
-        $this->data[$index] = $value;
+        $this->data = $data;
     }
+
+//    public function add($index, $value)
+//    {
+//        $this->data[$index] = $value;
+//    }
 
     public function get($index, $default = '')
     {
-        if (empty($default) && !isset($this->data[$index])) {
+        if ('' === $default && !isset($this->data[$index])) {
             $this->getIdentifierExceptionNotFound($index);
         }
 
-        if (!empty($default) && !isset($this->data[$index])) {
+        if ('' !== $default && !isset($this->data[$index])) {
             return $default;
         }
 
@@ -40,5 +49,13 @@ the parameter: {$index} in post does not exist
 TXT;
 
         throw new \Exception($message);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllParams()
+    {
+        return $this->data;
     }
 }

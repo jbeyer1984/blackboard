@@ -11,25 +11,28 @@ use src\App\Blackboard\Entity\EntryEntity;
 use src\App\Blackboard\Entity\ExperienceEntity;
 use src\App\Blackboard\Entity\ExperienceEntityCollection;
 use src\App\Blackboard\Entity\PersonEntity;
+use src\Core\Entity\TransformerInterface;
+use src\Core\Form\Components\Request\RequestDataBind;
 
 /**
  * is based on json from Blackboard Configuration
  * Class EntryCollectionTransformer
  * @package App\Blackboard\EntityNew\Transformer
  */
-class EntryCollectionTransformer
+class EntryCollectionTransformer implements TransformerInterface
 {
     /**
      * @param array $data
+     * @param RequestDataBind $requestDataBind
      * @return EntryCollection
      */
-    public function toObj($data)
+    public function toObj($data, RequestDataBind $requestDataBind = null)
     {
         $entryCollection = new EntryCollection();
         foreach ($data as $timeEntry) {
             $personalEntity = null;
             $person = $timeEntry['person'];
-            $personalEntity = new PersonEntity($person['id'], $person['name']);
+            $personalEntity = new PersonEntity($person['id'], $person['name'], $person['number'], $person['optional']);
             $danceCollection = new DanceEntityCollection();
             $danceEntry = $timeEntry['dance'];
             foreach ($danceEntry as $danceSubEntry) {

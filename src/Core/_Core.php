@@ -3,11 +3,8 @@
 namespace src\Core;
 
 //use src\Container\Container;
-use src\Core\DI\Service;
 use src\Core\DI\ServiceComponent;
-use src\Router\_Router;
-use src\Router\Router;
-//use src\Utilities\Db;
+use src\Router\Factory\RouterFactory;
 use src\Utilities\Logger\MyLogger;
 use src\Utilities\Service\BaseUtilities;
 use src\Utilities\Session;
@@ -21,10 +18,9 @@ class _Core extends ServiceComponent
      */
     public function register()
     {
-        $routerService = Service::get(_Router::class);
-
-        $router = $routerService->getSingle(Router::class);
-//        $this->set(MyLogger::class, ['']);
+        $routerFactory = new RouterFactory();
+        $router = $routerFactory->getCreated();
+        
         $this->set(MyLogger::class);
         $this->set(Template::class);
 
@@ -33,8 +29,6 @@ class _Core extends ServiceComponent
             $router,
             Template::class
         ]);
-        
-//        $this->inject(Db::class, Container::getInstance()->getDb());
         
         $this->set(Session::class);
     }

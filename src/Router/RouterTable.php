@@ -5,12 +5,26 @@ namespace src\Router;
 
 
 use src\Controller\Blackboard\BlackboardController;
+use src\Controller\Login\LoginController;
 
 class RouterTable
 {
     public function getTable()
     {
         $table = [
+            [
+                'url' => 'login/show',
+                'controller' => LoginController::class,
+                'action' => 'showAction',
+            ],
+            [
+                'url' => 'login/login',
+                'controller' => LoginController::class,
+                'action' => 'loginAction',
+                'postParameter' => [
+                    'login',
+                ]
+            ],
             [
                 'url' => 'show',
                 'controller' => BlackboardController::class,

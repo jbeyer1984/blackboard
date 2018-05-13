@@ -10,16 +10,9 @@ use src\App\Blackboard\Entity\Transformer\Json\EntryCollectionTransformer AS Jso
 use src\App\Blackboard\Entity\EntryCollection;
 use src\App\Blackboard\Form\AddEntryForm;
 use src\App\Blackboard\Form\EditEntryForm;
-use src\Core\DI\Service;
-use src\Utilities\Service\BaseUtilities;
 
 class BlackboardEntries
 {
-    /**
-     * @var BaseUtilities
-     */
-    private $base;
-
     /**
      * @var EntryFile
      */
@@ -32,20 +25,38 @@ class BlackboardEntries
 
     /**
      * BlackboardEntries constructor.
-     * @param BaseUtilities $base
+     * @param EntryFile $entryFile
+     * @param JsonEntryCollectionTransformer $jsonTransformer
      */
-    public function __construct(BaseUtilities $base)
+    public function __construct(EntryFile $entryFile, JsonEntryCollectionTransformer $jsonTransformer)
     {
-        $this->base = $base;
-        
-        $this->init();
+        $this->entryFile       = $entryFile;
+        $this->jsonTransformer = $jsonTransformer;
     }
 
-    protected function init()
-    {
-        $this->entryFile       = Service::get(_Blackboard::class)->getSingle(EntryFile::class);
-        $this->jsonTransformer = Service::get(_Blackboard::class)->getSingle(JsonEntryCollectionTransformer::class);
-    }
+//    /**
+//     * BlackboardEntries constructor.
+//     * @param BaseUtilities $base
+//     */
+//    public function __construct(BaseUtilities $base)
+//    {
+//        $this->base = $base;
+//        
+//        $this->init();
+//    }
+
+//    public function __construct()
+//    {
+//        $this->init();
+//    }
+
+
+
+//    protected function init()
+//    {
+//        $this->entryFile       = Service::get(_Blackboard::class)->getSingle(EntryFile::class);
+//        $this->jsonTransformer = Service::get(_Blackboard::class)->getSingle(JsonEntryCollectionTransformer::class);
+//    }
 
     /**
      * @return EntryCollection

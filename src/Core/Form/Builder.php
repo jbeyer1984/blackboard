@@ -16,17 +16,9 @@ use src\Core\Form\Components\TextField;
 use src\Core\Form\Components\Type\Bind\BindParameterBase;
 use src\Core\Form\Components\Type\CheckBox;
 use src\Core\Form\Components\Type\Output\SimpleType;
-use src\Core\_Core;
-use src\Core\DI\Service;
-use src\Utilities\Service\BaseUtilities;
 
 class Builder implements BuilderInterface
 {
-    /**
-     * @var BaseUtilities
-     */
-    private $base;
-    
     /**
      * @var string
      */
@@ -70,7 +62,6 @@ class Builder implements BuilderInterface
      */
     public function __construct($namespace, Resolver $resolver, RequestTree $requestTree)
     {
-        $this->base = Service::get(_Core::class)->getSingle(BaseUtilities::class);
         $this->namespace = $namespace;
         $this->resolver = $resolver;
         $this->requestTree = $requestTree;
