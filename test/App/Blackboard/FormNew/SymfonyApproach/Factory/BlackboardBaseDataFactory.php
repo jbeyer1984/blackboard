@@ -12,10 +12,9 @@ class BlackboardBaseDataFactory
     /**
      * @return BlackboardBaseDataFromJson
      */
-    public static function getBlackboardBaseDataFromJson()
+    public function getBlackboardBaseDataFromJson()
     {
-        $blackboardBaseData = new self();
-        $blackboardBaseDataFromJson = $blackboardBaseData->createBlackboardBaseDataFromJson();
+        $blackboardBaseDataFromJson = $this->createBlackboardBaseDataFromJson();
 
         return $blackboardBaseDataFromJson;
     }
@@ -36,7 +35,8 @@ class BlackboardBaseDataFactory
      */
     private function createEntryFile()
     {
-        $entryFile = EntryFileFactory::getCreatedDefaultEntryFile();
+        $factory = new EntryFileFactory();
+        $entryFile = $factory->getCreatedDefaultEntryFile();
 
         return $entryFile;
     }

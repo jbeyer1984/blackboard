@@ -31,7 +31,7 @@ class FormHandlerFactory
      * @param Request $request
      * @return LoginFormHandler
      */
-    public static function getCreatedLoginFormHandler(Request $request)
+    public function getCreatedLoginFormHandler(Request $request)
     {
         $self = new self($request);
         $loginFormHandler = $self->createLoginFormHandler();

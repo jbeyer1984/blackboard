@@ -14,13 +14,9 @@ use src\Core\Form\Creator\FormCreator;
 use src\Router\Request\Post;
 use src\Router\Request\Request;
 use src\Utilities\Service\BaseUtilities;
-use src\Core\Form\Components\Provider\NestedRead\NestedNamespaces;
 use src\Core\Form\Components\Provider\NestedRead\NestedOrderedBuilder;
 use src\Core\Form\Components\Provider\NestedRead\NestedOrderedComponents;
 use src\Core\Form\Components\Provider\NestedRead\NestedOrderedRender;
-use src\Core\Form\Components\Render\Components\TypeWrapper;
-use src\Core\Form\Components\Render\Components\Collection\TypeWrapperCollection;
-use src\Core\Form\Components\Render\RenderWrapper;
 use test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Entity\DanceEntity;
 use test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Entity\DanceEntityCollection;
 use test\App\Blackboard\FormNew\SymfonyApproach\Creator\Mock\Entity\EntryEntity;
@@ -42,7 +38,8 @@ class FormCreatorTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->base = BaseUtilitiesFactory::getCreatedBaseUtilities();
+        $factory = new BaseUtilitiesFactory();
+        $this->base = $factory->getCreatedBaseUtilities();
 //        $entryFile = Service::get(_Blackboard::class)->getSingle(EntryFile::class);
 //        $testBaseDataFromJson = new testBaseDataFromJson($entryFile);
 //        Service::get(_Blackboard::class)->inject(BlackboardBaseDataFromJson::class, $testBaseDataFromJson);
@@ -147,61 +144,61 @@ class FormCreatorTest extends \PHPUnit_Framework_TestCase
             ]);
         });
 
-        /** @var EntryType $entryTypeMock */
-        $formCreator = new FormCreator($entryTypeMock, $entryEntity);
-        $formCreator->build();
-        
-
-        $entriesOrdered = $formCreator->getBuilder()->getEntriesOrdered();
-        $entriesMap = $formCreator->getBuilder()->getEntriesMap();
-//        $this->base->getLogger()->log($entriesMap, '$entriesMap');
-        $nestedNamespaces = new NestedNamespaces($formCreator->getBuilder());
-        $entriesMapNamespaceNested = $nestedNamespaces->getEntriesMapNested();
-//        $this->base->getLogger()->log($entriesMapNamespaceNested, '$entriesMapNamespaceNested');
-        
-//        $nestedComponent = new NestedComponent($formCreator->getBuilder());
-//        $component = $nestedComponent->getNestedComponentByNamespace('entry[dance][0][experience]');
-//        $this->base->getLogger()->log($component, '$component');
-
-        $nestedComponent = new NestedOrderedComponents($formCreator->getBuilder());
-//        $components = $nestedComponent->getNestedComponentsByNamespace('entry[dance][#][name]');
-//        $components = $nestedComponent->getNestedComponentsByNamespace('entry[dance][#][experience]');
-//        $components = $nestedComponent->getNestedComponentsByNamespace('entry[person][#]');
-//        $this->base->getLogger()->log($components, '$component');
-        
-        $nestedOrderRendered = new NestedOrderedRender($formCreator->getBuilder());
-        $html = $nestedOrderRendered->getEntriesNestedRendered();
-//        $this->base->getLogger()->log($html, '$html');
-        
-        $renderWrapper = new RenderWrapper($formCreator->getBuilder());
-        $builderCollectionWrapperCollection = new TypeWrapperCollection();
-        $builderCollectionWrapperCollection->add(new TypeWrapper('entry[person]', '<div>'));
-        $builderCollectionWrapperCollection->add(new TypeWrapper('entry[dance]', '<div>'));
-        $renderWrapper->injectTypeWrapper($builderCollectionWrapperCollection);
-        $html = $renderWrapper->render();
-//        $this->base->getLogger()->log($html, '$html');
-        
-        
-        $nestedOrderedBuilder = new NestedOrderedBuilder($formCreator->getBuilder());
-//        $builder = $nestedOrderedBuilder->getEntriesNestedRenderedByNamespace('entry[person]');
-        $builder = $nestedOrderedBuilder->getBuilderNestedByNamespace('entry[dance]');
-
-        $requestTree = $formCreator->getBuilder()->getRequestTree();
-        $postTree = $requestTree->getPostTree();
-        $arr = array_keys($postTree);
-        $this->base->getLogger()->log($arr, '$arr');
-        $check = $postTree['entry[dance][2][experience]'];
-//        $this->base->getLogger()->log($check, '$check');
-
-        $builders = $nestedOrderedBuilder->getBuilderNestedByNamespace('entry[dance]');
-        
-        foreach ($builders as $builder) {
-            if ($builder instanceof BuilderCollection) {
-                foreach ($builder->getBuilderCollection() as $bui) {
-                    $bui->getNestedBuilderRelation()->printIt();
-                }
-            }
-        }
+//        /** @var EntryType $entryTypeMock */
+//        $formCreator = new FormCreator($entryTypeMock, $entryEntity);
+//        $formCreator->build();
+//        
+//
+//        $entriesOrdered = $formCreator->getBuilder()->getEntriesOrdered();
+//        $entriesMap = $formCreator->getBuilder()->getEntriesMap();
+////        $this->base->getLogger()->log($entriesMap, '$entriesMap');
+//        $nestedNamespaces = new NestedNamespaces($formCreator->getBuilder());
+//        $entriesMapNamespaceNested = $nestedNamespaces->getEntriesMapNested();
+////        $this->base->getLogger()->log($entriesMapNamespaceNested, '$entriesMapNamespaceNested');
+//        
+////        $nestedComponent = new NestedComponent($formCreator->getBuilder());
+////        $component = $nestedComponent->getNestedComponentByNamespace('entry[dance][0][experience]');
+////        $this->base->getLogger()->log($component, '$component');
+//
+//        $nestedComponent = new NestedOrderedComponents($formCreator->getBuilder());
+////        $components = $nestedComponent->getNestedComponentsByNamespace('entry[dance][#][name]');
+////        $components = $nestedComponent->getNestedComponentsByNamespace('entry[dance][#][experience]');
+////        $components = $nestedComponent->getNestedComponentsByNamespace('entry[person][#]');
+////        $this->base->getLogger()->log($components, '$component');
+//        
+//        $nestedOrderRendered = new NestedOrderedRender($formCreator->getBuilder());
+//        $html = $nestedOrderRendered->getEntriesNestedRendered();
+////        $this->base->getLogger()->log($html, '$html');
+//        
+//        $renderWrapper = new RenderWrapper($formCreator->getBuilder());
+//        $builderCollectionWrapperCollection = new TypeWrapperCollection();
+//        $builderCollectionWrapperCollection->add(new TypeWrapper('entry[person]', '<div>'));
+//        $builderCollectionWrapperCollection->add(new TypeWrapper('entry[dance]', '<div>'));
+//        $renderWrapper->injectTypeWrapper($builderCollectionWrapperCollection);
+//        $html = $renderWrapper->render();
+////        $this->base->getLogger()->log($html, '$html');
+//        
+//        
+//        $nestedOrderedBuilder = new NestedOrderedBuilder($formCreator->getBuilder());
+////        $builder = $nestedOrderedBuilder->getEntriesNestedRenderedByNamespace('entry[person]');
+//        $builder = $nestedOrderedBuilder->getBuilderNestedByNamespace('entry[dance]');
+//
+//        $requestTree = $formCreator->getBuilder()->getRequestTree();
+//        $postTree = $requestTree->getPostTree();
+//        $arr = array_keys($postTree);
+//        $this->base->getLogger()->log($arr, '$arr');
+//        $check = $postTree['entry[dance][2][experience]'];
+////        $this->base->getLogger()->log($check, '$check');
+//
+//        $builders = $nestedOrderedBuilder->getBuilderNestedByNamespace('entry[dance]');
+//        
+//        foreach ($builders as $builder) {
+//            if ($builder instanceof BuilderCollection) {
+//                foreach ($builder->getBuilderCollection() as $bui) {
+//                    $bui->getNestedBuilderRelation()->printIt();
+//                }
+//            }
+//        }
         
         $requestMock = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
@@ -239,6 +236,7 @@ class FormCreatorTest extends \PHPUnit_Framework_TestCase
 //        $formCreator->build();
         $formCreator->handleRequest($requestMock);
 
+        $nestedComponent = new NestedOrderedComponents($formCreator->getBuilder());
         $components = $nestedComponent->getNestedComponentsByNamespace('entry[person][name]');
 
 

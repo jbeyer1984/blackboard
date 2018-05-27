@@ -25,7 +25,8 @@ class Login
 
     protected function init()
     {
-        $this->base = BaseUtilitiesFactory::getCreatedBaseUtilities();
+        $baseUtilitiesFactory = new BaseUtilitiesFactory();
+        $this->base = $baseUtilitiesFactory->getCreatedBaseUtilities();
     }
 
     public function show()
@@ -48,7 +49,8 @@ class Login
         if ($valid) {
             $this->base->getRouter()->redirect('/blackboard.php/show');
         } else {
-            $loginFormHandler = FormHandlerFactory::getCreatedLoginFormHandler($request);
+            $factory = new FormHandlerFactory($request);
+            $loginFormHandler = $factory->getCreatedLoginFormHandler($request);
             $valid = $loginFormHandler->validate();
             if ($valid) {
                 $loginHandler->write();

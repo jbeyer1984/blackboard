@@ -16,12 +16,12 @@ class RouterFactory
         return $router;
     }
 
-    /**
-     * @return Router
+    /**     * @return Router
      */
     private function createRouter()
     {
-        $request = RequestFactory::getCreatedRequest();
+        $factory = new RequestFactory();
+        $request = $factory->getCreatedRequest();
 
         $router = new Router($request);
         

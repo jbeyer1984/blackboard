@@ -34,7 +34,8 @@ class BlackboardEntriesFactory
      */
     private function createEntryFile()
     {
-        $entryFile = EntryFileFactory::getCreatedDefaultEntryFile();
+        $factory = new EntryFileFactory();
+        $entryFile = $factory->getCreatedDefaultEntryFile();
         
         return $entryFile;
     }

@@ -35,7 +35,8 @@ class BlackboardFactory
      */    
     private function createBaseUtilities()
     {
-        $baseUtilities = BaseUtilitiesFactory::getCreatedBaseUtilities();
+        $factory = new BaseUtilitiesFactory();
+        $baseUtilities = $factory->getCreatedBaseUtilities();
 
         return $baseUtilities;
     }

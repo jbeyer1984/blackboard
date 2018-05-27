@@ -8,6 +8,8 @@ use src\App\Blackboard\Entity\DanceEntity;
 use src\App\Blackboard\Entity\DanceEntityCollection;
 use src\App\Blackboard\Factory\BlackboardBaseDataFactory;
 use src\App\Blackboard\Form\Iterator\DanceEntityCollectionIterator;;
+
+use src\App\Blackboard\Form\Transformer\Post\DanceEntityCollectionTransformer;
 use src\Core\Form\AbstractType;
 use src\Core\Form\BuilderInterface;
 use src\Core\Form\ResolverInterface;
@@ -26,7 +28,8 @@ class DanceCollectionType extends AbstractType
 
     public function resolve(ResolverInterface $resolver)
     {
-        $blackboardBaseData = BlackboardBaseDataFactory::getBlackboardBaseDataFromJson();
+        $factory = new BlackboardBaseDataFactory();
+        $blackboardBaseData = $factory->getBlackboardBaseDataFromJson();
         $danceEntityCollection = $blackboardBaseData
             ->getDanceEntityCollection()
         ;
@@ -45,6 +48,9 @@ class DanceCollectionType extends AbstractType
                     'identifier' => 'id',
                     'add_attributes' => ['name']
                 ]
+            ],
+            'transformer' => [
+                'post' => DanceEntityCollectionTransformer::class
             ]
         ]);
     }

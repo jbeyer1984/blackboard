@@ -55,7 +55,6 @@ class Router
     {
         $routerTable = new RouterTable();
         $table = $routerTable->getTable();
-        
         foreach ($table as $entry) {
             if (0 === stripos($this->lookup, $entry['url'])) {
                 $controllerName = $entry['controller']; // no injection at moment
@@ -66,16 +65,6 @@ class Router
                 if (empty($afterIndex)) {
                     $controllerName = $entry['controller']; // no injection at moment
                     $action = $entry['action'];
-                } else {
-//                    $afterIndexArgs = explode('/', $afterIndex);
-//                    $args = $this->checkRequest($entry, $afterIndexArgs);
-//                    
-//                    if (empty($args)) {
-//                        $errorMessage = <<<TXT
-//url {$entry['url']} is wrong defined, context args
-//TXT;
-//                        throw new \Exception($errorMessage);       
-//                    }
                 }
                 
 //                $dump = print_r($controllerName, true);

@@ -12,34 +12,15 @@ use src\Utilities\Template;
 class BaseUtilitiesFactory
 {
     /**
-     * @var BaseUtilities
-     */
-    private static $baseUtilities;
-
-    /**
      * @return BaseUtilities
      */
-    public static function getCreatedBaseUtilities()
-    {
-        if (is_null(self::$baseUtilities)) {
-            $self = new self();
-            self::$baseUtilities = $self->createBaseUtilities();
-        }
-        
-
-        return self::$baseUtilities;
-    }
-
-    /**
-     * 
-     */
-    private function createBaseUtilities()
+    public function getCreatedBaseUtilities()
     {
         $router = $this->createRouter();
         $logger = $this->createLogger();
         $template = $this->createTemplate();
         $baseUtilities = new BaseUtilities($logger, $router, $template);
-        
+
         return $baseUtilities;
     }
 

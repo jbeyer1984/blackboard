@@ -77,7 +77,7 @@ class BlackboardEntries
     {
         $existingData = $this->entryFile->readRelation();
         $newEntryEntity = $entryEntity->createActual();
-        
+
         $existingData[$newEntryEntity->getId()] = $newEntryEntity->toArray();
 
         $this->entryFile->storeRelation($existingData);

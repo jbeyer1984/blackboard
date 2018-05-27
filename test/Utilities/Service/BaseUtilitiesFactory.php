@@ -4,7 +4,6 @@
 namespace test\Utilities\Service;
 
 
-use src\Router\Factory\RouterFactory;
 use src\Router\Router;
 use src\Utilities\Logger\MyLogger;
 use src\Utilities\Service\BaseUtilities;
@@ -13,27 +12,9 @@ use src\Utilities\Template;
 class BaseUtilitiesFactory extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var BaseUtilities
-     */
-    private static $baseUtilities;
-
-    /**
      * @return BaseUtilities
      */
-    public static function getCreatedBaseUtilities()
-    {
-        if (is_null(self::$baseUtilities)) {
-            $self = new self();
-            self::$baseUtilities = $self->createBaseUtilities();
-        }
-
-        return self::$baseUtilities;
-    }
-
-    /**
-     *
-     */
-    public function createBaseUtilities()
+    public function getCreatedBaseUtilities()
     {
         $router = $this->createRouter();
         $logger = $this->createLogger();

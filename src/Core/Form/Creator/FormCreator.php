@@ -4,14 +4,16 @@
 namespace src\Core\Form\Creator;
 
 
+use src\Core\Entity\TransformerInterface;
 use src\Core\Form\AbstractType;
 use src\Core\Form\Builder;
 use src\Core\Form\Components\Matcher\NotMatchedData;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\NextSubCollectionRelationCollection;
 use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentSubCollectionBind;
 use src\Core\Form\Components\Provider\NestedRead\NestedOrderedComponents;
 use src\Core\Form\Components\Request\RequestDataBind;
 use src\Core\Form\Components\Request\RequestTree;
-use src\Core\Form\NestedBuilderRelation;
+use src\Core\Form\Creator\Factory\LookupSubFormRelationFactory;
 use src\Core\Form\Resolver;
 use src\Router\Request\Request;
 
@@ -64,82 +66,35 @@ class FormCreator
 
     public function handleRequest(Request $request)
     {
-        $request = $request->getPost()->getAllParams();
+//        $request = $request->getPost()->getAllParams();
         $this->formType->resolve($this->resolver);
         $this->formType->build($this->builder);
         
         $nestedComponentSearcher = new NestedOrderedComponents($this->getBuilder());
         
         $setLater = [];
-
+        
+        $lookupSubFormRelationFactory = new LookupSubFormRelationFactory();
+        $lookupSubFormRelation = $lookupSubFormRelationFactory->getCreatedLookupSubFormRelation(
+            $this->builder,
+            $nestedComponentSearcher
+        );
+        $lookupSubFormRelation->determine();
+        
         foreach ($this->builder->getRequestTree()->getPostTree() as $identifier => $component) {
-            $components = $nestedComponentSearcher->getNestedComponentsByNamespace($identifier);
-            // check nested child relation exists
-            if (!empty($components)) {
-                if ($component instanceof RequestDataBind) {
-                    $builder = $component->getBuilder();
-                    if (!is_null($builder) && !is_null($builder->getNestedBuilderRelation())) {
-                        foreach ($builder->getNestedBuilderRelation()->getChildrenIdentifiers() as $childRelationIdentifier) {
-                            $setLater[$childRelationIdentifier] = [
-                                'nestedRelation' => $builder->getNestedBuilderRelation(),
-                                'data' => $component
-                            ];
-                        }
-                    }
-                }
-            }
             if ($component instanceof RequestDataBind) {
-                if ($component->getData() instanceof ParentSubCollectionBind) {
-                    /** @var ParentSubCollectionBind $parentSubCollectionBind */
-                    $parentSubCollectionBind = $component->getData();
-                    $parentCollection = $parentSubCollectionBind->getParentCollection();
-                    $nextSubCollectionIdentifierCollection = 
-                        $parentSubCollectionBind->getSubCollectionRelationCollection()
-                    ;
-//                    if (method_exists($parentCollection, 'clear')) { /** @todo other approach maybe */
-//                            $parentCollection->clear();
-//                    }
-                    foreach ($nextSubCollectionIdentifierCollection->getCollection() as $subCollectionRelation) {
-                        $nameChain = $subCollectionRelation->getNameChain();
-                        if (false !== $this->requestNestedByString($nameChain, $request)) {
-                            if (method_exists($parentCollection, 'add')) {
-                                if ($subCollectionRelation->getData() instanceof NotMatchedData) {
-                                    $attributesCheck = true;
-                                    $nameChainSubCollection = $subCollectionRelation->getNameChain();
-                                    foreach ($parentSubCollectionBind->getPostRelevant() as $attribute) {
-                                        $nameChainToCheck = $nameChainSubCollection . '[' . $attribute . ']';
-                                        if (false === $this->requestNestedByString($nameChainToCheck, $request)) {
-                                            $attributesCheck = false;
-                                        }
-                                    }
-                                    if ($attributesCheck) {
-                                        $parentCollection->add($subCollectionRelation->getData()->getData()); /** @todo add Interface maybe */
-                                    }
-                                } // else not implemented, because is existing should not be overwritten or existing twice
-                            }
-                        } else {
-                            /** @todo have to implement remove */
-                            if (method_exists($parentCollection, 'remove')) { /** @todo other approach maybe */
-                                if ($subCollectionRelation->getData() instanceof NotMatchedData) {
-                                    // nothing to change
-                                    // if not in request existing and before it was not on/enabled
-                                } else {
-                                    $parentCollection->remove($subCollectionRelation->getData());
-                                }
-                            }
-                        }
-                    }
-                    continue; /** @todo bad approach here */
-                }
+                $attribute = $this->addOrDeleteEntry($request, $component);
                 if (!is_null($component->getTransformer())) {
                     if (false !== $this->requestNestedByString($identifier, $request)) {
                         $requestValue = $this->requestNestedByString($identifier, $request);
                         $transformerClass = $component->getTransformer();
                         $transformer = new $transformerClass();
-                        $newData = $transformer->toObj($requestValue, $component); /** @todo implement interface */
-                        $component->forceData($newData);    
+                        if ($transformer instanceof TransformerInterface) {
+                            $newData = $transformer->toObj($requestValue, $component); /** @todo implement interface */
+                            $component->forceData($newData);
+                        }
                     }
-                } else {
+                } elseif (!is_null($component->getHtmlType())) { /** @todo check on interface */
                     $type = $component->getHtmlType();
                     $data = $component->getData();
                     $value = $type->getValue();
@@ -157,23 +112,7 @@ class FormCreator
                     }
                 }
             }
-            if (!empty($setLater)) {
-                if (isset($setLater[$identifier])) {
-                    $nestedRelation = $setLater[$identifier]['nestedRelation'];
-                    if ($nestedRelation instanceof NestedBuilderRelation) {
-                        $setMethod = 'set' . ucfirst($nestedRelation->getIdentifier());
-                        $data = $setLater[$identifier]['data'];
-                        if ($data instanceof RequestDataBind) {
-                            $componentToSet = $data->getData();
-                            if ($component instanceof RequestDataBind) {
-                                $data = $component->getData();
-                                $componentToSet->$setMethod($data);
-                            }
-                        }
-                    }
-                    unset($setLater[$identifier]);
-                }
-            }
+            $lookupSubFormRelation->changeData($identifier, $component);
         }
     }
 
@@ -182,11 +121,12 @@ class FormCreator
      * @param array $request
      * @return mixed
      */
-    private function requestNestedByString($identifier, $request)
+    private function requestNestedByString($identifier, Request $request)
     {
         $identifier = str_replace(']', '', $identifier);
         $explodedIdentifiers = explode('[', $identifier);
-        return $this->requestNestedByStrongLoop($explodedIdentifiers, $request);
+        $params = $request->getPost()->getAllParams();
+        return $this->requestNestedByStrongLoop($explodedIdentifiers, $params);
     }
 
     /**
@@ -230,5 +170,75 @@ class FormCreator
     public function getResolver()
     {
         return $this->resolver;
+    }
+
+    /**
+     * @param Request $request
+     * @param RequestDataBind $component
+     */
+    private function addOrDeleteEntry(Request $request, $component)
+    {
+        if ($component->getData() instanceof ParentSubCollectionBind) {
+            /** @var ParentSubCollectionBind $parentSubCollectionBind */
+            $parentSubCollectionBind               = $component->getData();
+            $parentCollection                      = $parentSubCollectionBind->getParentCollection();
+            $nextSubCollectionIdentifierCollection =
+                $parentSubCollectionBind->getSubCollectionRelationCollection();
+//                    if (method_exists($parentCollection, 'clear')) { /** @todo other approach maybe */
+//                            $parentCollection->clear();
+//                    }
+            $this->addOrDeleteSubOrParent($request, $nextSubCollectionIdentifierCollection, $parentCollection, $parentSubCollectionBind);
+
+            return true;
+//                    continue; /** @todo bad approach here */
+        }
+        
+        return false;
+    }
+
+    /**
+     * @param Request $request
+     * @param $nextSubCollectionIdentifierCollection
+     * @param $parentCollection
+     * @param $parentSubCollectionBind
+     */
+    private function addOrDeleteSubOrParent(
+        Request $request,
+        NextSubCollectionRelationCollection $nextSubCollectionIdentifierCollection,
+        $parentCollection, $parentSubCollectionBind
+    )
+    {
+        foreach ($nextSubCollectionIdentifierCollection->getCollection() as $subCollectionRelation) {
+            $nameChain = $subCollectionRelation->getNameChain();
+            if (false !== $this->requestNestedByString($nameChain, $request)) {
+                if (method_exists($parentCollection, 'add')) {
+                    if ($subCollectionRelation->getData() instanceof NotMatchedData) {
+                        $attributesCheck        = true;
+                        $nameChainSubCollection = $subCollectionRelation->getNameChain();
+                        foreach ($parentSubCollectionBind->getPostRelevant() as $attribute) {
+                            $nameChainToCheck = $nameChainSubCollection . '[' . $attribute . ']';
+                            if (false === $this->requestNestedByString($nameChainToCheck, $request)) {
+                                $attributesCheck = false;
+                            }
+                        }
+                        if ($attributesCheck) {
+                            $parentCollection->add($subCollectionRelation->getData()->getData());
+                            /** @todo add Interface maybe */
+                        }
+                    } // else not implemented, because is existing should not be overwritten or existing twice
+                }
+            } else {
+                /** @todo have to implement remove */
+                if (method_exists($parentCollection, 'remove')) {
+                    /** @todo other approach maybe */
+                    if ($subCollectionRelation->getData() instanceof NotMatchedData) {
+                        // nothing to change
+                        // if not in request existing and before it was not on/enabled
+                    } else {
+                        $parentCollection->remove($subCollectionRelation->getData());
+                    }
+                }
+            }
+        }
     }
 }

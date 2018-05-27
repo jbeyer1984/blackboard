@@ -6,10 +6,10 @@ namespace src\App\Blackboard\Form\Transformer\Post;
 
 use src\App\Blackboard\Entity\ExperienceEntity;
 use src\App\Blackboard\Entity\ExperienceEntityCollection;
+use src\App\Blackboard\Factory\BlackboardBaseDataFactory;
 use src\Core\Entity\TransformerInterface;
 use src\Core\Form\Components\Provider\ProviderDataIterator;
 use src\Core\Form\Components\Request\RequestDataBind;
-use test\App\Blackboard\FormNew\SymfonyApproach\Factory\BlackboardBaseDataFactory;
 
 class ExperienceEntityCollectionTransformer implements TransformerInterface
 {
@@ -20,13 +20,14 @@ class ExperienceEntityCollectionTransformer implements TransformerInterface
      */
     public function toObj($requestVal, RequestDataBind $bind = null)
     {
+        $factory = new BlackboardBaseDataFactory();
         $experienceEntityCollection = new ExperienceEntityCollection();
         
         $data = $bind->getData();
         if ($data instanceof ProviderDataIterator) {
             $dataToChange = $data->getData();
             if ($dataToChange instanceof ExperienceEntityCollection) {
-                $blackboardBaseData = BlackboardBaseDataFactory::getBlackboardBaseDataFromJson();
+                $blackboardBaseData = $factory->getBlackboardBaseDataFromJson();
                 /** @var ExperienceEntityCollection $allExperienceEntityCollection */
                 $allExperienceEntityCollection = $blackboardBaseData
                     ->getExperienceEntityCollection()

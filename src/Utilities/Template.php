@@ -6,10 +6,12 @@ class Template
 {
 //    private $data;
     
-    public function getView($viewFile, $arr)
+    public function getView($viewFile, $arr = [])
     {
 //        $this->data = $arr;
-        extract($arr);
+        if (!empty($arr)) {
+            extract($arr);
+        }
         include_once(VIEW_PATH . '/' . $viewFile);
     }
 }

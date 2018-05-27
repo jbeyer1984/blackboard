@@ -26,7 +26,8 @@ class DanceCollectionType extends AbstractType
 
     public function resolve(ResolverInterface $resolver)
     {
-        $blackboardBaseDataFromJson = BlackboardBaseDataFactory::getBlackboardBaseDataFromJson();
+        $factory = new BlackboardBaseDataFactory();
+        $blackboardBaseDataFromJson = $factory->getBlackboardBaseDataFromJson();
         $danceEntityCollection = $blackboardBaseDataFromJson
             ->getDanceEntityCollection()
         ;

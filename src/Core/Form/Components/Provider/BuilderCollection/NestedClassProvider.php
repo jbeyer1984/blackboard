@@ -198,7 +198,7 @@ TXT;
         $this->requestTree->add(
             $simpleTypeOutput->getNamespace(),
             new RequestDataBind(
-                $data, [$identifier], null, $this->builder//, $this->resolver->getTransformer()
+                $data, [$identifier], null, $this->builder, $this->resolver->getTransformer()
             )
         );
     }

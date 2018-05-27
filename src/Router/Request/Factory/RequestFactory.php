@@ -11,19 +11,18 @@ class RequestFactory
     /**
      * @var Request
      */
-    private static $request;
+    private $request;
 
     /**
      * @return Request
      */
-    public static function getCreatedRequest()
+    public function getCreatedRequest()
     {
-        if (is_null(self::$request)) {
-            $self = new self();
-            self::$request = $self->createRequest();
+        if (is_null($this->request)) {
+            $this->request = $this->createRequest();
         }
         
-        return self::$request;
+        return $this->request;
     }
 
     /**

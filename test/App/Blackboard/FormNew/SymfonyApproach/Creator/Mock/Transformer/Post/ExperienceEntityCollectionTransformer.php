@@ -20,13 +20,14 @@ class ExperienceEntityCollectionTransformer implements TransformerInterface
      */
     public function toObj($requestVal, RequestDataBind $bind = null)
     {
+        $facotry = new BlackboardBaseDataFactory();
         $experienceCollection = new ExperienceEntityCollection();
         
         $data = $bind->getData();
         if ($data instanceof ProviderDataIterator) {
             $dataToChange = $data->getData();
             if ($dataToChange instanceof ExperienceEntityCollection) {
-                $blackboardBaseData = BlackboardBaseDataFactory::getBlackboardBaseDataFromJson();
+                $blackboardBaseData = $facotry->getBlackboardBaseDataFromJson();
                 /** @var ExperienceEntityCollection $experienceEntityCollection */
                 $experienceEntityCollection = $blackboardBaseData
                     ->getExperienceEntityCollection()

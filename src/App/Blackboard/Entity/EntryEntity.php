@@ -48,7 +48,8 @@ class EntryEntity implements ToArrayInterface
      */
     public function createActual()
     {
-        $entryFile = EntryFileFactory::getCreatedDefaultEntryFile();
+        $entryFileFactory = new EntryFileFactory();
+        $entryFile = $entryFileFactory->getCreatedDefaultEntryFile();
         $existingData = $entryFile->readRelation();
         $lastEntry = array_pop($existingData);
         $entryId = $lastEntry['id'];

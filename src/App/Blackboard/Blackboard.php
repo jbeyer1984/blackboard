@@ -87,9 +87,6 @@ class Blackboard
 
     public function store(Request $request)
     {
-        $dump = print_r($_POST, true);
-        error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $_POST ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
-        
         $entry = $request->getPost()->get('entry');
         $entryId = $entry['id'];
         $form = $this->blackboardEntries->getEditForm($entryId);

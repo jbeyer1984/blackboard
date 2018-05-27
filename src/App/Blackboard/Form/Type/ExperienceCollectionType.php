@@ -26,7 +26,8 @@ class ExperienceCollectionType extends AbstractType
 
     public function resolve(ResolverInterface $resolver)
     {
-        $blackboardBaseData = BlackboardBaseDataFactory::getBlackboardBaseDataFromJson();
+        $factory = new BlackboardBaseDataFactory();
+        $blackboardBaseData = $factory->getBlackboardBaseDataFromJson();
         $experienceEntityCollection = $blackboardBaseData
             ->getExperienceEntityCollection()
         ;

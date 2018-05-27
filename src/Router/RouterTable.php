@@ -6,12 +6,18 @@ namespace src\Router;
 
 use src\Controller\Blackboard\BlackboardController;
 use src\Controller\Login\LoginController;
+use src\Controller\OverviewController;
 
 class RouterTable
 {
     public function getTable()
     {
         $table = [
+            [
+                'url' => '/blackboard.php',
+                'controller' => OverviewController::class,
+                'action' => 'indexAction',
+            ],
             [
                 'url' => 'login/show',
                 'controller' => LoginController::class,

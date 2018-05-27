@@ -43,6 +43,8 @@ class LoginSessionHandler implements ValidateInterface
      */
     public function validate()
     {
+//        return true;
+        
         $loginHandlerCollection = new LoginHandlerCollection();
         $loginHandlerCollection->add(new PasswordSessionValidator());
         $this->loginHandlerChain = new LoginHandlerChain($loginHandlerCollection);
