@@ -8,9 +8,11 @@ use src\Core\Form\AbstractType;
 use src\Core\Form\Builder;
 use src\Core\Form\BuilderCollection;
 use src\Core\Form\Components\Matcher\NotMatchedData;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\Dispatcher\DataDispatcher;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\Dispatcher\IteratorDataDispatcher;
 use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentSubCollectionBind;
-use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\SubCollectionRelation;
-use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\NextSubCollectionRelationCollection;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\SubRelationCollection;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\SubRelationCollectionCollection;
 use src\Core\Form\Components\Provider\ProviderDataIterator;
 use src\Core\Form\Components\Request\RequestDataBind;
 use src\Core\Form\Components\Request\RequestTree;
@@ -70,123 +72,48 @@ class NestedClassProvider
     {
         $nameChain         = $builderCollectionIdentifier;
         $builderCollection = new BuilderCollection($nameChain);
-        $data              = $this->resolver->getToResolve();
-        $dataToMatch       = $this->resolver->getMatchData();
-        $dataArray = [];
-        $dataMatchArray = [];
-        if ($data instanceof ProviderDataIterator) {
-            if (!empty($dataToMatch)) {
-                $dataMatchArray = $this->getDeterminedIteratorDataArray($dataToMatch, $nameChain);
-            }
-            $dataArray = $this->getDeterminedIteratorDataArray($data, $nameChain);
-        } else {
-            if (!empty($dataToMatch)) {
-                $dataMatchArray = $this->getDeterminedDataArray($dataToMatch, $nameChain);
-            }
-            $dataArray = $this->getDeterminedDataArray($data, $nameChain);
-        }
+        $dataDispatcher = null;
+        $data = $this->resolver->getToResolve();
 
-        $providerData = null;
-        $nextSubCollectionIdentifierCollection = null;
+        $subCollectionIdentifierCollection = new SubRelationCollectionCollection();
+
         if ($data instanceof ProviderDataIterator) {
+            $dataDispatcher = new IteratorDataDispatcher($this->resolver, $nameChain);
+            $dataDispatcher->dispatch();
+            $dataArray = $dataDispatcher->getDataArray();
+            $dataMatchArray = $dataDispatcher->getDataToMatchArray();
+
+            $this->addFormAndBuilderBehaviour(
+                $dataMatchArray, $dataArray,
+                $subCollectionIdentifierCollection, $builderCollection
+            );
+
             $simpleTypeOutput = new SimpleType($nameChain, '');
             $providerData = $data->getData();
             if ($providerData instanceof CollectionInterface) {
-                $nextSubCollectionIdentifierCollection = new NextSubCollectionRelationCollection();
                 $identifierSubCollectionBind = new ParentSubCollectionBind(
                     $data->getPostRelevant(),
-                    $providerData, $nextSubCollectionIdentifierCollection
+                    $providerData, $subCollectionIdentifierCollection
                 );
                 // add request data before filling $nextSubCollectionIdentifierCollection downwards
                 $this->addRequestDataBind($nameChain, $simpleTypeOutput, $identifierSubCollectionBind);
             }
-        }
-        if (!empty($dataMatchArray)) {
-            foreach ($dataMatchArray as $nameChainCorrelation => $matchData) {
-                if (!isset($dataArray[$nameChainCorrelation])) {
-                    $notMatchedData = new NotMatchedData($matchData);
-                    $dataForResolver = $notMatchedData;
-                } else {
-                    $dataForResolver = $dataArray[$nameChainCorrelation];
-                }
-
-                if (!is_null($nextSubCollectionIdentifierCollection)) { /** @todo also implement for part below */
-                    $subCollectionRelation = new SubCollectionRelation($nameChainCorrelation, $dataForResolver);
-                    $nextSubCollectionIdentifierCollection->add($subCollectionRelation);
-                }
-                
-                $chainResolver = new Resolver($dataForResolver);
-                $chainResolver->forceToResolve($dataForResolver);
-
-                $builder = new Builder($nameChainCorrelation, $chainResolver, $this->requestTree);
-                $this->formType->build($builder);
-                $builderCollection->add($builder);
-            }    
         } else {
-            foreach ($dataArray as $nameChain => $data) {
-                if (!is_null($nextSubCollectionIdentifierCollection)) {
-                    $subCollectionRelation = new SubCollectionRelation($nameChain, $data);
-                    $nextSubCollectionIdentifierCollection->add($subCollectionRelation);
-                }
-                $dataForResolver = $dataArray[$nameChain];
-                $chainResolver = new Resolver($dataForResolver);
-                $chainResolver->forceToResolve($dataForResolver);
+            $dataDispatcher = new DataDispatcher($this->resolver, $nameChain);
+            $dataDispatcher->dispatch();
+            $dataArray = $dataDispatcher->getDataArray();
+            $dataMatchArray = $dataDispatcher->getDataToMatchArray();
 
-                $builder = new Builder($nameChain, $chainResolver, $this->requestTree);
-                $this->formType->build($builder);
-                $builderCollection->add($builder);
-            }
+            $this->addFormAndBuilderBehaviour(
+                $dataMatchArray, $dataArray,
+                $subCollectionIdentifierCollection, $builderCollection
+            );
         }
         
         return $builderCollection;
     }
 
-    /**
-     * @param ProviderDataIterator $data
-     * @param string $nameChain
-     * @return array
-     */
-    private function getDeterminedIteratorDataArray(ProviderDataIterator $data, $nameChain)
-    {
-        $providerClass = $data->getProvider();
-        $provider      = new $providerClass($data->getData());
-        $dataArray = [];
-        foreach ($provider as $iteratorClass) {
-            if ($data->getIteratorClass() == get_class($iteratorClass)) {
-                $getMethod               = 'get' . ucfirst($data->getIdentifier());
-                $iteratorClassIdentifier = $iteratorClass->$getMethod();
-                $iteratorNameChain       = <<<TXT
-{$nameChain}[{$iteratorClassIdentifier}]
-TXT;
-                $dataArray[$iteratorNameChain] = $iteratorClass;
-            }
-        }
-        
-        return $dataArray;
-    }
-
-    /**
-     * @param array $dataToIterate
-     * @param $nameChain
-     * @return array
-     */
-    private function getDeterminedDataArray($dataToIterate, $nameChain)
-    {
-        $dataArray = [];
-        $iteratorNameChain = <<<TXT
-{$nameChain}
-TXT;
-        if (!is_array($dataToIterate)) {
-            $dataArray[$iteratorNameChain] = $dataToIterate;
-        } else {
-            foreach ($dataToIterate as $index => $iteratorClass) {
-                
-                $dataArray[$iteratorNameChain][$index] = $iteratorClass;
-            }    
-        }
-        
-        return $dataArray;
-    }
+    
 
     /**
      * @param string $identifier
@@ -201,5 +128,55 @@ TXT;
                 $data, [$identifier], null, $this->builder, $this->resolver->getTransformer()
             )
         );
+    }
+
+    /**
+     * @param $dataMatchArray
+     * @param $dataArray
+     * @param SubRelationCollectionCollection $nextSubCollectionIdentifierCollection
+     * @param BuilderCollection $builderCollection
+     */
+    private function addFormAndBuilderBehaviour(
+        $dataMatchArray, $dataArray,
+        SubRelationCollectionCollection $nextSubCollectionIdentifierCollection,
+        BuilderCollection $builderCollection
+    )
+    {
+        if (!empty($dataMatchArray)) {
+            foreach ($dataMatchArray as $nameChainCorrelation => $matchData) {
+                if (!isset($dataArray[$nameChainCorrelation])) {
+                    $notMatchedData  = new NotMatchedData($matchData);
+                    $dataForResolver = $notMatchedData;
+                } else {
+                    $dataForResolver = $dataArray[$nameChainCorrelation];
+                }
+
+                if (!is_null($nextSubCollectionIdentifierCollection)) {
+                    $subCollectionRelation = new SubRelationCollection($nameChainCorrelation, $dataForResolver);
+                    $nextSubCollectionIdentifierCollection->add($subCollectionRelation);
+                }
+
+                $chainResolver = new Resolver($dataForResolver);
+                $chainResolver->forceToResolve($dataForResolver);
+
+                $builder = new Builder($nameChainCorrelation, $chainResolver, $this->requestTree);
+                $this->formType->build($builder);
+                $builderCollection->add($builder);
+            }
+        } else {
+            foreach ($dataArray as $nameChain => $data) {
+                if (!is_null($nextSubCollectionIdentifierCollection)) {
+                    $subCollectionRelation = new SubRelationCollection($nameChain, $data);
+                    $nextSubCollectionIdentifierCollection->add($subCollectionRelation);
+                }
+                $dataForResolver = $dataArray[$nameChain];
+                $chainResolver   = new Resolver($dataForResolver);
+                $chainResolver->forceToResolve($dataForResolver);
+
+                $builder = new Builder($nameChain, $chainResolver, $this->requestTree);
+                $this->formType->build($builder);
+                $builderCollection->add($builder);
+            }
+        }
     }
 }

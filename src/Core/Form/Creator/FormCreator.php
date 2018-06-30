@@ -8,7 +8,7 @@ use src\Core\Entity\TransformerInterface;
 use src\Core\Form\AbstractType;
 use src\Core\Form\Builder;
 use src\Core\Form\Components\Matcher\NotMatchedData;
-use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\NextSubCollectionRelationCollection;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\SubRelationCollectionCollection;
 use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentSubCollectionBind;
 use src\Core\Form\Components\Provider\NestedRead\NestedOrderedComponents;
 use src\Core\Form\Components\Request\RequestDataBind;
@@ -72,8 +72,6 @@ class FormCreator
         
         $nestedComponentSearcher = new NestedOrderedComponents($this->getBuilder());
         
-        $setLater = [];
-        
         $lookupSubFormRelationFactory = new LookupSubFormRelationFactory();
         $lookupSubFormRelation = $lookupSubFormRelationFactory->getCreatedLookupSubFormRelation(
             $this->builder,
@@ -83,7 +81,6 @@ class FormCreator
         
         foreach ($this->builder->getRequestTree()->getPostTree() as $identifier => $component) {
             if ($component instanceof RequestDataBind) {
-                $attribute = $this->addOrDeleteEntry($request, $component);
                 if (!is_null($component->getTransformer())) {
                     if (false !== $this->requestNestedByString($identifier, $request)) {
                         $requestValue = $this->requestNestedByString($identifier, $request);
@@ -204,8 +201,8 @@ class FormCreator
      */
     private function addOrDeleteSubOrParent(
         Request $request,
-        NextSubCollectionRelationCollection $nextSubCollectionIdentifierCollection,
-        $parentCollection, $parentSubCollectionBind
+        SubRelationCollectionCollection $nextSubCollectionIdentifierCollection,
+        $parentCollection, ParentSubCollectionBind $parentSubCollectionBind
     )
     {
         foreach ($nextSubCollectionIdentifierCollection->getCollection() as $subCollectionRelation) {

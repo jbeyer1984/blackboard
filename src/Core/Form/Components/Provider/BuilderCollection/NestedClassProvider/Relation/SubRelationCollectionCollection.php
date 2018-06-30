@@ -6,20 +6,20 @@ namespace src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvide
 
 use src\Core\Entity\CollectionInterface;
 
-class NextSubCollectionRelationCollection implements CollectionInterface
+class SubRelationCollectionCollection implements CollectionInterface
 {
     /**
-     * @var SubCollectionRelation[]
+     * @var SubRelationCollection[]
      */
     private $collection;
 
-    public function add(SubCollectionRelation $relation)
+    public function add(SubRelationCollection $relation)
     {
         $this->collection[] = $relation;
     }
 
     /**
-     * @return SubCollectionRelation[]
+     * @return SubRelationCollection[]
      */
     public function getCollection()
     {

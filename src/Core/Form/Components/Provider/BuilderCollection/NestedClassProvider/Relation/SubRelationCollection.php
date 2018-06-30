@@ -3,7 +3,7 @@
 
 namespace src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation;
 
-class SubCollectionRelation
+class SubRelationCollection
 {
     /**
      * @var string
