@@ -17,7 +17,7 @@ class LaterRelationCollection implements CollectionInterface
      * @param $identifier
      * @return bool
      */
-    public function isExisting($identifier)
+    public function has($identifier)
     {
         $existing = isset($this->collection[$identifier]);
             
@@ -90,7 +90,7 @@ class LaterRelationCollection implements CollectionInterface
      */
     private function identifierIndexNotInCollectionException($identifier)
     {
-        if (!isset($this->collection[$identifier])) {
+        if (!$this->has($identifier)) {
             throw new \Exception("identifier index: {$identifier} not in collection");
         }
     }

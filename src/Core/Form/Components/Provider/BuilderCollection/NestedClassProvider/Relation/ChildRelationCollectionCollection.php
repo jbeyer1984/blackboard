@@ -6,7 +6,7 @@ namespace src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvide
 
 use src\Core\Entity\CollectionInterface;
 
-class SubRelationCollectionCollection implements CollectionInterface
+class ChildRelationCollectionCollection implements CollectionInterface
 {
     /**
      * @var SubRelationCollection[]

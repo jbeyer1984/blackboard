@@ -6,7 +6,7 @@ namespace src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvide
 
 use src\Core\Entity\CollectionInterface;
 
-class ParentSubCollectionBind
+class ParentChildCollectionBind
 {
     /**
      * @var array
@@ -19,19 +19,19 @@ class ParentSubCollectionBind
     private $parentCollection;
 
     /**
-     * @var SubRelationCollectionCollection
+     * @var ChildRelationCollectionCollection
      */
-    private $subCollectionRelationCollection;
+    private $childRelationCollectionCollection;
 
     /**
      * ParentSubCollectionBind constructor.
      * @param array $addAttributes
      * @param CollectionInterface $parentCollection
-     * @param SubRelationCollectionCollection $subCollectionRelationCollection
+     * @param ChildRelationCollectionCollection $childRelationCollectionCollection
      */
     public function __construct(
         array $addAttributes, CollectionInterface $parentCollection,
-        SubRelationCollectionCollection $subCollectionRelationCollection
+        ChildRelationCollectionCollection $childRelationCollectionCollection
     ) {
         $this->postRelevant                    = $addAttributes;
         $this->parentCollection                = $parentCollection;
@@ -39,12 +39,12 @@ class ParentSubCollectionBind
         $dump = print_r($cl, true);
         error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $cl ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
         
-        $this->subCollectionRelationCollection = $subCollectionRelationCollection;
-        $clSub = get_class($this->subCollectionRelationCollection);
-        $dump = print_r($clSub, true);
+        $this->childRelationCollectionCollection = $childRelationCollectionCollection;
+        $clSub                                   = get_class($this->childRelationCollectionCollection);
+        $dump                                    = print_r($clSub, true);
         error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $clSub ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
 
-        foreach ($this->subCollectionRelationCollection->getCollection() as $subRelationCollection) {
+        foreach ($this->childRelationCollectionCollection->getCollection() as $subRelationCollection) {
             $subRel = get_class($subRelationCollection);
             $dump = print_r($subRel, true);
             error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $subRel ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
@@ -76,10 +76,10 @@ class ParentSubCollectionBind
     }
 
     /**
-     * @return SubRelationCollectionCollection
+     * @return ChildRelationCollectionCollection
      */
-    public function getSubCollectionRelationCollection()
+    public function getChildRelationCollectionCollection()
     {
-        return $this->subCollectionRelationCollection;
+        return $this->childRelationCollectionCollection;
     }
 }

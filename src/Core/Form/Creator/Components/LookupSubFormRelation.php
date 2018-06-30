@@ -54,6 +54,19 @@ class LookupSubFormRelation
     }
 
     /**
+     * @param $identifier
+     * @param RequestDataBind $component
+     */
+    public function changeData($identifier, $component)
+    {
+        if (!$this->laterRelationCollection->has($identifier)) {
+            return;
+        };
+        $this->changeRelationData($identifier, $component);
+        $this->laterRelationCollection->remove($identifier);
+    }
+
+    /**
      * @param $component
      */
     private function handleRequestDataBind($component)
@@ -76,7 +89,7 @@ class LookupSubFormRelation
             // have to check because 2 same entries can exist because nested relation
             // do not decide between nestedType or IteratorType Nested
             // so there can be doubled relations
-            if (!$this->laterRelationCollection->isExisting($childRelationIdentifier)) {
+            if (!$this->laterRelationCollection->has($childRelationIdentifier)) {
                 $this->laterRelationCollection->add(
                     $childRelationIdentifier,
                     new LaterRelation(
@@ -86,20 +99,6 @@ class LookupSubFormRelation
                 );
             }
         }
-    }
-
-    /**
-     * @param $identifier
-     * @param RequestDataBind $component
-     */
-    public function changeData($identifier, $component)
-    {
-        if (!$this->laterRelationCollection->isExisting($identifier)) {
-            return;
-        };
-//        $nestedRelation = $setLater[$identifier]['nestedRelation'];
-        $this->changeRelationData($identifier, $component);
-        $this->laterRelationCollection->remove($identifier);
     }
 
     /**

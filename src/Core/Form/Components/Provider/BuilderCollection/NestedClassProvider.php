@@ -10,9 +10,9 @@ use src\Core\Form\BuilderCollection;
 use src\Core\Form\Components\Matcher\NotMatchedData;
 use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\Dispatcher\DataDispatcher;
 use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\Dispatcher\IteratorDataDispatcher;
-use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentSubCollectionBind;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentChildCollectionBind;
 use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\SubRelationCollection;
-use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\SubRelationCollectionCollection;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ChildRelationCollectionCollection;
 use src\Core\Form\Components\Provider\ProviderDataIterator;
 use src\Core\Form\Components\Request\RequestDataBind;
 use src\Core\Form\Components\Request\RequestTree;
@@ -75,7 +75,7 @@ class NestedClassProvider
         $dataDispatcher = null;
         $data = $this->resolver->getToResolve();
 
-        $subCollectionIdentifierCollection = new SubRelationCollectionCollection();
+        $childIdentifierCollectionCollection = new ChildRelationCollectionCollection();
 
         if ($data instanceof ProviderDataIterator) {
             $dataDispatcher = new IteratorDataDispatcher($this->resolver, $nameChain);
@@ -85,15 +85,15 @@ class NestedClassProvider
 
             $this->addFormAndBuilderBehaviour(
                 $dataMatchArray, $dataArray,
-                $subCollectionIdentifierCollection, $builderCollection
+                $childIdentifierCollectionCollection, $builderCollection
             );
 
             $simpleTypeOutput = new SimpleType($nameChain, '');
             $providerData = $data->getData();
             if ($providerData instanceof CollectionInterface) {
-                $identifierSubCollectionBind = new ParentSubCollectionBind(
+                $identifierSubCollectionBind = new ParentChildCollectionBind(
                     $data->getPostRelevant(),
-                    $providerData, $subCollectionIdentifierCollection
+                    $providerData, $childIdentifierCollectionCollection
                 );
                 // add request data before filling $nextSubCollectionIdentifierCollection downwards
                 $this->addRequestDataBind($nameChain, $simpleTypeOutput, $identifierSubCollectionBind);
@@ -106,7 +106,7 @@ class NestedClassProvider
 
             $this->addFormAndBuilderBehaviour(
                 $dataMatchArray, $dataArray,
-                $subCollectionIdentifierCollection, $builderCollection
+                $childIdentifierCollectionCollection, $builderCollection
             );
         }
         
@@ -133,12 +133,12 @@ class NestedClassProvider
     /**
      * @param $dataMatchArray
      * @param $dataArray
-     * @param SubRelationCollectionCollection $nextSubCollectionIdentifierCollection
+     * @param ChildRelationCollectionCollection $nextSubCollectionIdentifierCollection
      * @param BuilderCollection $builderCollection
      */
     private function addFormAndBuilderBehaviour(
         $dataMatchArray, $dataArray,
-        SubRelationCollectionCollection $nextSubCollectionIdentifierCollection,
+        ChildRelationCollectionCollection $nextSubCollectionIdentifierCollection,
         BuilderCollection $builderCollection
     )
     {

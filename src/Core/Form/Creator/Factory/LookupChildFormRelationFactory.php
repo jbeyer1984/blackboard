@@ -9,7 +9,7 @@ use src\Core\Form\Components\Provider\NestedRead\NestedOrderedComponents;
 use src\Core\Form\Creator\Components\LookupSubFormRelation;
 use src\Core\Form\Creator\Components\LookupSubFormRelation\LaterRelationCollection;
 
-class LookupSubFormRelationFactory
+class LookupChildFormRelationFactory
 {
     /**
      * @param Builder $builder

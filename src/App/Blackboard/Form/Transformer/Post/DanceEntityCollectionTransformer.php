@@ -7,7 +7,7 @@ namespace src\App\Blackboard\Form\Transformer\Post;
 use src\App\Blackboard\Entity\DanceEntity;
 use src\App\Blackboard\Entity\DanceEntityCollection;
 use src\Core\Entity\TransformerInterface;
-use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentSubCollectionBind;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentChildCollectionBind;
 use src\Core\Form\Components\Request\RequestDataBind;
 
 class DanceEntityCollectionTransformer implements TransformerInterface
@@ -23,7 +23,7 @@ class DanceEntityCollectionTransformer implements TransformerInterface
         foreach ($requestVal as $index => $entry) {
             if (empty($entry['name'])) {
                 $data = $bind->getData();
-                if ($data instanceof ParentSubCollectionBind) {
+                if ($data instanceof ParentChildCollectionBind) {
                     $parentSubCollectionBind = $data;
                     $collection = $parentSubCollectionBind->getParentCollection();
                     $idToRemove = $entry['id'];
