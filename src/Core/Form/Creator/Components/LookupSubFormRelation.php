@@ -124,6 +124,9 @@ class LookupSubFormRelation
             if ($data instanceof RequestDataBind && $component instanceof RequestDataBind) {
                 $componentToSet = $data->getData();
                 $data = $component->getData();
+//                $dump = print_r(get_class($componentToSet), true);
+//                error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** get_class($componentToSet) ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
+                
                 $componentToSet->$setMethod($data);
             }
         }

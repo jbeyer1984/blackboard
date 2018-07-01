@@ -66,6 +66,7 @@ class BlackboardEntries
         $data = $this->entryFile->readRelation();
         
         $entryCollection = $this->jsonTransformer->toObj($data);
+        $entryCollection->sortReverse();
         
         return $entryCollection;
     }

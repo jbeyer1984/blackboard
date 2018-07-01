@@ -27,6 +27,21 @@ class EntryCollection implements ToArrayInterface, CollectionInterface
         return $this->collection;
     }
 
+    public function sortReverse()
+    {
+        uasort($this->collection, function ($row, $row2) {
+            /** @var EntryEntity $row */
+            /** @var EntryEntity $row2 */
+            if ($row->getId() == $row2->getId()) {
+                return 0;
+            }
+
+            return ($row->getId() > $row2->getId()) ? -1 : 1;
+        });
+        
+        return $this;
+    }
+
     /**
      * @return array
      */

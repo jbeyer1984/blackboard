@@ -6,6 +6,10 @@
     <title>Document</title>
 
     <link rel="stylesheet" href="/public/css/blackboard.css">
+    <script src="/public/js/lib/jquery-1.11.3.js"></script>
+    <script type="application/javascript" src="/public/js/a_load/a_load.js"></script>
+<!--    <script src="/public/js/a_load/project.js"></script>-->
+<!--    <script src="/public/js/main.js"></script>-->
 </head>
 <body>
     <div id="page_wrapper">
@@ -23,6 +27,11 @@
             </div>
             <br>
             <div class="spacer"></div>
+            <div id="search">
+                <input class="search_text" type="text" />
+                <input class="search_button" type="button" value="search"/>
+            </div>
+            <div class="spacer"></div>
             <div id="entries">
                 <?php use src\App\Blackboard\Entity\EntryCollection;
                 use src\Core\Utitlity\UrlHelper;
@@ -32,7 +41,7 @@
                 foreach ($entries->getCollection() as $entry): ?>
                 <div class="entry">
                     <input type="hidden" name="entry_id" value="<?= $entry->getId() ?>"/>
-                    <div id="time">
+                    <div class="time">
                         <span><?= $entry->getTime() ?></span>
                         <?php
                         $editUrl = UrlHelper::getCreatedUrl(
