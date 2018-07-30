@@ -28,11 +28,6 @@ class DanceEntityCollectionTransformer implements TransformerInterface
                 if ($data instanceof ParentChildCollectionBind) {
                     $parentSubCollectionBind = $data;
                     $collection = $parentSubCollectionBind->getParentCollection();
-//                    $collection = $parentSubCollectionBind->getChildRelationCollectionCollection();
-//                    $collection = $collection->getCollection();
-                    $dump = print_r($collection, true);
-                    error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $collection ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
-                    
                     $idToRemove = $entry['id'];
                     $entryToRemove = null;
                     foreach ($collection->getCollection() as $entryDance) {
@@ -49,9 +44,6 @@ class DanceEntityCollectionTransformer implements TransformerInterface
                 }
             }
         }
-        $dump = print_r($collection, true);
-        error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** $collection ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
-        
 
         return $collection;
     }

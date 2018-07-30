@@ -7,6 +7,9 @@ namespace src\Core\Form\Creator;
 use src\Core\Entity\TransformerInterface;
 use src\Core\Form\AbstractType;
 use src\Core\Form\Builder;
+use src\Core\Form\Components\Matcher\NotMatchedData;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ChildRelationCollectionCollection;
+use src\Core\Form\Components\Provider\BuilderCollection\NestedClassProvider\Relation\ParentChildCollectionBind;
 use src\Core\Form\Components\Provider\NestedRead\NestedOrderedComponents;
 use src\Core\Form\Components\Request\RequestDataBind;
 use src\Core\Form\Components\Request\RequestTree;
@@ -77,6 +80,7 @@ class FormCreator
         $lookupChildFormRelation->determine();
         
         foreach ($this->builder->getRequestTree()->getPostTree() as $identifier => $component) {
+            $this->addOrDeleteEntry($request, $component);
             if ($component instanceof RequestDataBind) {
                 if (!is_null($component->getTransformer())) {
                     if (false !== $this->requestNestedByString($identifier, $request)) {
@@ -166,73 +170,73 @@ class FormCreator
         return $this->resolver;
     }
 
-//    /**
-//     * @param Request $request
-//     * @param RequestDataBind $component
-//     */
-//    private function addOrDeleteEntry(Request $request, $component)
-//    {
-//        if ($component->getData() instanceof ParentSubCollectionBind) {
-//            /** @var ParentSubCollectionBind $parentSubCollectionBind */
-//            $parentSubCollectionBind               = $component->getData();
-//            $parentCollection                      = $parentSubCollectionBind->getParentCollection();
-//            $nextSubCollectionIdentifierCollection =
-//                $parentSubCollectionBind->getSubCollectionRelationCollection();
-////                    if (method_exists($parentCollection, 'clear')) { /** @todo other approach maybe */
-////                            $parentCollection->clear();
-////                    }
-//            $this->addOrDeleteSubOrParent($request, $nextSubCollectionIdentifierCollection, $parentCollection, $parentSubCollectionBind);
-//
-//            return true;
-////                    continue; /** @todo bad approach here */
-//        }
-//        
-//        return false;
-//    }
-//
-//    /**
-//     * @param Request $request
-//     * @param $nextSubCollectionIdentifierCollection
-//     * @param $parentCollection
-//     * @param $parentSubCollectionBind
-//     */
-//    private function addOrDeleteSubOrParent(
-//        Request $request,
-//        SubRelationCollectionCollection $nextSubCollectionIdentifierCollection,
-//        $parentCollection, ParentSubCollectionBind $parentSubCollectionBind
-//    )
-//    {
-//        foreach ($nextSubCollectionIdentifierCollection->getCollection() as $subCollectionRelation) {
-//            $nameChain = $subCollectionRelation->getNameChain();
-//            if (false !== $this->requestNestedByString($nameChain, $request)) {
-//                if (method_exists($parentCollection, 'add')) {
-//                    if ($subCollectionRelation->getData() instanceof NotMatchedData) {
-//                        $attributesCheck        = true;
-//                        $nameChainSubCollection = $subCollectionRelation->getNameChain();
-//                        foreach ($parentSubCollectionBind->getPostRelevant() as $attribute) {
-//                            $nameChainToCheck = $nameChainSubCollection . '[' . $attribute . ']';
-//                            if (false === $this->requestNestedByString($nameChainToCheck, $request)) {
-//                                $attributesCheck = false;
-//                            }
-//                        }
-//                        if ($attributesCheck) {
-//                            $parentCollection->add($subCollectionRelation->getData()->getData());
-//                            /** @todo add Interface maybe */
-//                        }
-//                    } // else not implemented, because is existing should not be overwritten or existing twice
-//                }
-//            } else {
-//                /** @todo have to implement remove */
-//                if (method_exists($parentCollection, 'remove')) {
-//                    /** @todo other approach maybe */
-//                    if ($subCollectionRelation->getData() instanceof NotMatchedData) {
-//                        // nothing to change
-//                        // if not in request existing and before it was not on/enabled
-//                    } else {
-//                        $parentCollection->remove($subCollectionRelation->getData());
+    /**
+     * @param Request $request
+     * @param RequestDataBind $component
+     */
+    private function addOrDeleteEntry(Request $request, $component)
+    {
+        if ($component->getData() instanceof ParentChildCollectionBind) {
+            /** @var ParentChildCollectionBind $parentSubCollectionBind */
+            $parentSubCollectionBind               = $component->getData();
+            $parentCollection                      = $parentSubCollectionBind->getParentCollection();
+            $nextSubCollectionIdentifierCollection =
+                $parentSubCollectionBind->getChildRelationCollectionCollection();
+//                    if (method_exists($parentCollection, 'clear')) { /** @todo other approach maybe */
+//                            $parentCollection->clear();
 //                    }
-//                }
-//            }
-//        }
-//    }
+            $this->addOrDeleteSubOrParent($request, $nextSubCollectionIdentifierCollection, $parentCollection, $parentSubCollectionBind);
+
+            return true;
+//                    continue; /** @todo bad approach here */
+        }
+        
+        return false;
+    }
+
+    /**
+     * @param Request $request
+     * @param $nextSubCollectionIdentifierCollection
+     * @param $parentCollection
+     * @param $parentSubCollectionBind
+     */
+    private function addOrDeleteSubOrParent(
+        Request $request,
+        ChildRelationCollectionCollection $nextSubCollectionIdentifierCollection,
+        $parentCollection, ParentChildCollectionBind $parentSubCollectionBind
+    )
+    {
+        foreach ($nextSubCollectionIdentifierCollection->getCollection() as $subCollectionRelation) {
+            $nameChain = $subCollectionRelation->getNameChain();
+            if (false !== $this->requestNestedByString($nameChain, $request)) {
+                if (method_exists($parentCollection, 'add')) {
+                    if ($subCollectionRelation->getData() instanceof NotMatchedData) {
+                        $attributesCheck        = true;
+                        $nameChainSubCollection = $subCollectionRelation->getNameChain();
+                        foreach ($parentSubCollectionBind->getPostRelevant() as $attribute) {
+                            $nameChainToCheck = $nameChainSubCollection . '[' . $attribute . ']';
+                            if (false === $this->requestNestedByString($nameChainToCheck, $request)) {
+                                $attributesCheck = false;
+                            }
+                        }
+                        if ($attributesCheck) {
+                            $parentCollection->add($subCollectionRelation->getData()->getData());
+                            /** @todo add Interface maybe */
+                        }
+                    } // else not implemented, because is existing should not be overwritten or existing twice
+                }
+            } else {
+                /** @todo have to implement remove */
+                if (method_exists($parentCollection, 'remove')) {
+                    /** @todo other approach maybe */
+                    if ($subCollectionRelation->getData() instanceof NotMatchedData) {
+                        // nothing to change
+                        // if not in request existing and before it was not on/enabled
+                    } else {
+                        $parentCollection->remove($subCollectionRelation->getData());
+                    }
+                }
+            }
+        }
+    }
 }

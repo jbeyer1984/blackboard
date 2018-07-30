@@ -2,6 +2,7 @@
 
 namespace src\App\Blackboard;
 
+use src\App\Blackboard\Factory\BlackboardBaseDataFactory;
 use src\Core\Utitlity\UrlHelper;
 use src\Router\Request\Request;
 use src\Utilities\Service\BaseUtilities;
@@ -41,7 +42,12 @@ class Blackboard
 //    }
 
     public function show()
-    {   
+    {
+        $factory = new BlackboardBaseDataFactory();
+        $blackboardBaseData = $factory->getBlackboardBaseDataFromJson();
+        $danceEntityCollection = $blackboardBaseData
+            ->getDanceEntityCollection()
+        ;
         $entryCollection = $this->blackboardEntries->read();
         $form = $this->blackboardEntries->getAddForm();
         $html = $form->getRenderedForm();
@@ -52,6 +58,7 @@ class Blackboard
         $viewPath = 'blackboard/show.php';
         $this->base->getTemplate()->getView($viewPath, [
             'formData' => $formData,
+            'danceEntityCollection' => $danceEntityCollection,
             'entries' => $entryCollection
         ]);
     }

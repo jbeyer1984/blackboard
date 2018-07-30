@@ -22,14 +22,34 @@
                         <?= $arr['formData'] ?>
                         <input class="submit_entry" type="submit" name="submit_entry"/>
                     </div>
-                    <br>
+                    <br/>
                 </form>
             </div>
-            <br>
             <div class="spacer"></div>
-            <div id="search">
-                <input class="search_text" type="text" />
-                <input class="search_button" type="button" value="search"/>
+            <div id="search" class="extract">
+                <input class="reset_button" type="button" value="reset search"/>
+                <div class="spacer small"></div>
+                <div class="dance_type left spacer_horizontal">
+                <?php
+                    use src\App\Blackboard\Entity\DanceEntityCollection;
+                    $danceCollection = $arr['danceEntityCollection'];
+                    /** @var DanceEntityCollection $danceCollection */
+                ?>
+                <?php foreach ($danceCollection->getCollection() as $danceEntity): ?>
+                    <input type="checkbox" value="<?= $danceEntity->getName()?>" />
+                    <label><?= $danceEntity->getName()?></label>
+                    <br/>
+                <?php endforeach ?>
+                    <div class="spacer small"></div>
+                    <input class="search_button" type="button" value="search"/>
+                </div>
+               
+                <div class="search_type left">
+                    <label>number:</label>
+                    <input class="search_text" type="text" value="0406474756"/>
+                    <div class="spacer small"></div>
+                    <input class="search_button" type="button" value="search"/>
+                </div>
             </div>
             <div class="spacer"></div>
             <div id="entries">
@@ -53,13 +73,13 @@
                     </div>
                     <div id="person">
                         Person:
-                        <span class="name"><?= $entry->getPerson()->getName() ?></span>
+                        <span class="name_type"><?= $entry->getPerson()->getName() ?></span>
                         <br>
                         Number:
-                        <span class="name"><?= $entry->getPerson()->getNumber() ?></span>
+                        <span class="number_type"><?= $entry->getPerson()->getNumber() ?></span>
                         <br>
                         Sonstiges:
-                        <span class="name"><?= $entry->getPerson()->getOptional() ?></span>
+                        <span class="optional_type"><?= $entry->getPerson()->getOptional() ?></span>
                     </div>
                     <div id="dance">
                         <?php foreach ($entry->getDanceCollection()->getCollection() as $dance): ?>
