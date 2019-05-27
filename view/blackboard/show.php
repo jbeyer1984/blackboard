@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/public/css/blackboard.css">
     <script src="/public/js/lib/jquery-1.11.3.js"></script>
     <script type="application/javascript" src="/public/js/a_load/a_load.js"></script>
+    <script type="application/javascript" src="/public/js/main.js"></script>
 <!--    <script src="/public/js/a_load/project.js"></script>-->
 <!--    <script src="/public/js/main.js"></script>-->
 </head>
@@ -29,7 +30,7 @@
             <div id="search" class="extract">
                 <input class="reset_button" type="button" value="reset search"/>
                 <div class="spacer small"></div>
-                <div class="dance_type left spacer_horizontal">
+                <div class="search_type left spacer_horizontal">
                 <?php
                     use src\App\Blackboard\Entity\DanceEntityCollection;
                     $danceCollection = $arr['danceEntityCollection'];
@@ -41,6 +42,7 @@
                     <br/>
                 <?php endforeach ?>
                     <div class="spacer small"></div>
+                    <input type="hidden" value="search_dance">
                     <input class="search_button" type="button" value="search"/>
                 </div>
                
@@ -48,6 +50,7 @@
                     <label>number:</label>
                     <input class="search_text" type="text" value="0406474756"/>
                     <div class="spacer small"></div>
+                    <input type="hidden" value="search_number">
                     <input class="search_button" type="button" value="search"/>
                 </div>
             </div>

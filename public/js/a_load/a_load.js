@@ -11,7 +11,9 @@
 // more or less stolen from jquery core and adapted by paul irish
 
 var Loader = {
-    nestedCount: 1,
+    definedStack: [],
+    // index: 0,
+    initState: true,
     classStack: [],
     tryCounter: 0,
     
@@ -24,124 +26,112 @@ var Loader = {
         return loader;
     },
     
-    add: function() {
+    define: function() {
         var self = this;
         var args = [];
         Array.prototype.push.apply( args, arguments );
+        var definedArgs = args;
+        var executingScript = definedArgs.shift();
+        var scripts = definedArgs.shift();
+        var definedFunction = definedArgs.shift();
         
-        // return;
-
-        var loadScriptAsync = function(script, childCount, callback) {
-            var parentCount = callback();
-            var index = self.classStack[childCount].dependency[script];
-            var loop = function () {
-                // var parentScript = self.classStack[parentCount].parentScript;
-                // var nestedScript = self.classStack[childCount].parentScript;
-                if (true === self.classStack[childCount].scriptsLoaded) {
-                    return;
-                }
-                
-                self.tryCounter++;
-                
-                if (!self.classStack[childCount].scriptsLoaded
-                    && self.classStack[childCount].args.filter(Boolean).length === self.classStack[childCount].argsLengthMax
-                ) {
-                    self.classStack[childCount].scriptsLoaded = true;
-                    var obj = self.classStack[childCount].func.apply(self, self.classStack[childCount].args);
-                    
-                    if (self.classStack[parentCount].args.filter(Boolean).length < self.classStack[parentCount].argsLengthMax) {
-                        var index = self.classStack[parentCount].dependency[self.classStack[childCount].parentScript];
-                        if (undefined === self.classStack[parentCount].args[index]) {
-                            self.classStack[parentCount].args[index] = obj;
-                        }
-                    }
-                } else {
-                    setTimeout(loop, 200);
-                }
-            };
-                if ('jQuery' === script) {
-                    self.classStack[childCount].args[index] = jQuery;
-                    if (self.classStack[childCount].args === self.classStack[childCount].argsLengthMax) {
-                        self.classStack[childCount].scriptsLoaded = true;
-                    }
-                    loop();
-                } else {
-                    self.loadScript(script, function () {
-                        console.log("nestedCount:" + childCount + " loaded:" + script);
-                        loop();
-                    });
-                }
+        var definitions = {
+            script: executingScript,
+            scripts: scripts,
+            func: definedFunction
         };
-        var execute = function(loadScriptAsync) {
-            var definedArgs = args;
-            var parentScript = definedArgs.shift();
-            var scripts = definedArgs.shift();
-            var definedFunction = definedArgs.shift();
-            // var definedFunctionArgs = definedArgs;
-            var nestedCount = self.nestedCount;
-            var parentCount = 0;
-            for (var i in self.classStack) {
-                if (undefined !== self.classStack[i].dependency[parentScript]) {
-                    parentCount = i;
+        
+        if (self.initState) {
+            self.initState = false;
+            self.define(executingScript, [executingScript], function(param) {});
+            return;
+        }
+        
+        this.definedStack.push(definitions);
+
+        var index = this.definedStack.length -1;
+
+        var dependencyView = self.getGeneratedDependencies(scripts);
+
+        self.classStack[index] = {
+            script: executingScript,
+            dependency: dependencyView,
+            argsLengthMax: scripts.length,
+            args: [],
+            loading: true,
+            func: definedFunction,
+        }
+
+        var parentCount = index;
+        
+        while (0 < scripts.length) {
+            var script = scripts.shift();
+            if ('jQuery' === script) {
+                // self.loadScriptDirectly(definedFunction, index, executingScript);
+                var argIndex = self.classStack[parentCount].dependency[script];
+                self.classStack[parentCount].args[argIndex] = jQuery;
+                var loaded = true;
+                if (self.classStack[parentCount].args.filter(Boolean).length === self.classStack[parentCount].argsLengthMax) {
+                    self.classStack[parentCount].scriptsLoaded = true;
                 }
-            }
-
-            var dependencyView = {
-
-            };
-
-            if (0 < scripts.length) {
-                var scriptsCloned = scripts.slice();
-                var counter = 0;
-                while (0 < scriptsCloned.length) {
-                    var tempScript = scriptsCloned.shift();
-                    dependencyView[counter] = tempScript;
-                    dependencyView[tempScript] = counter;
-                    counter++;
-                }    
-            }
-            
-            self.classStack[nestedCount] = {
-                parentScript: parentScript,
-                args: [],
-                dependency: dependencyView,
-                argsLengthMax: scripts.length,
-                scriptsLoaded: false,
-                func: definedFunction
-            };    
-            
-            if (1 === nestedCount) {
-                parentCount = 0;
-                self.classStack[parentCount] = {
-                    parentScript: parentScript,
-                    args: [],
-                    dependency: dependencyView,
-                    argsLengthMax: scripts.length,
-                    scriptsLoaded: false,
-                    func: definedFunction
+            } else {
+                var loadFunc = function() { // will be called one time
+                    var lastItem = self.definedStack.length - 1;
+                    var loaded = true;
+                    var lastScript = self.definedStack[lastItem].script;
+                    self.loadAsync(lastItem, parentCount, lastScript, loaded);
                 };
+                self.loadScript(script, loadFunc);    
             }
-            var getParentCount = function() {
-                return parentCount;
-            };
-
-            if (0 === scripts.length) {
-                var obj = definedFunction();
-                self.classStack[nestedCount].scriptsLoaded = true;
-                var index = self.classStack[parentCount].dependency[parentScript];
-                
-                self.classStack[parentCount].args[index] = obj;
-            }
-            while (0 < scripts.length) {
-                var script = scripts.shift();
-                loadScriptAsync(script, nestedCount, getParentCount);
-            }
-        };
-        execute(loadScriptAsync);
-       
-        this.nestedCount++;
+        }
     },
 
+    createObject: function (index) {
+        this.classStack[index].scriptsLoaded = true;
+        var obj = this.classStack[index].func.apply(this, this.classStack[index].args);
+        return obj;
+    }, assignObjToParent: function (parentCount, script, obj) {
+        if (undefined !== this.classStack[parentCount].dependency[script]) {
+            if (this.classStack[parentCount].args.filter(Boolean).length < this.classStack[parentCount].argsLengthMax) {
+                var argIndex = this.classStack[parentCount].dependency[script];
+                if (undefined === this.classStack[parentCount].args[argIndex]) {
+                    this.classStack[parentCount].args[argIndex] = obj;
+                }
+            }
+        }
+    },
+    
+    loadAsync: function(index, parentCount, script, loaded) {
+        var self = this;
+        if (loaded) {
+            if (self.classStack[index].argsLengthMax !== self.classStack[index].args.filter(Boolean).length) {
+                setTimeout(function() {
+                    self.loadAsync(index, parentCount, script, loaded)
+                }, 100);
+                self.tryCounter++;
+                return;
+            } else {
+                var obj = self.createObject(index);
+                self.assignObjToParent(parentCount, script, obj);
+                return;
+            }
+        }
+    },
+
+    getGeneratedDependencies: function (scripts) {
+        var dependencyView = [];
+        if (0 < scripts.length) {
+            var scriptsCloned = scripts.slice();
+            var counter = 0;
+            while (0 < scriptsCloned.length) {
+                var tempScript = scriptsCloned.shift();
+                // dependencyView[counter] = tempScript;
+                dependencyView[tempScript] = counter;
+                counter++;
+            }
+        }
+        return dependencyView;
+    },
 
     loadScript: function(url,success) {
         var head = document.getElementsByTagName("head")[0], done = false;
@@ -159,12 +149,3 @@ var Loader = {
 };
 
 window.Loader = Loader.create();
-Loader.add('/public/js/a_load/a_load.js', ["/public/js/main.js"], function () {
-    console.log(Loader.tryCounter);
-});
-// Loader.loadFunctions();
-
-
-
-
-// getScript();

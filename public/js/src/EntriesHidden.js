@@ -1,4 +1,4 @@
-Loader.add(
+Loader.define(
     '/public/js/src/EntriesHidden.js',
     [],
     function (undefined) {
@@ -12,6 +12,10 @@ Loader.add(
 
             emptyEntriesToHide: function() {
                 this.entriesToHide = [];
+            },
+            
+            mergeEntriesToHide: function($entries) {
+                this.entriesToHide = $.merge(this.entriesToHide, $entries);
             },
 
             addEntriesToHide: function($entry) {

@@ -1,19 +1,19 @@
-Loader.add(
+Loader.define(
     '/public/js/src/Search.js',
     [
         "jQuery",
         "/public/js/src/SearchConfig.js",
-        "/public/js/src/SearchCss.js",
+        "/public/js/src/Search/Strategy/SearchDispatcher.js",
         "/public/js/src/EntriesHidden.js"
     ],
-    function ($, SearchConfig, SearchCss, EntriesHidden, undefined) {
+    function ($, SearchConfig, SearchDispatcher, EntriesHidden, undefined) {
         console.log("Search loaded");
         var Search = {
             create : function() {
                 var search = Object.create(this);
                 search.searchConfig = SearchConfig.create();
-                search.searchCss = SearchCss.create();
                 search.entriesHidden = EntriesHidden.create();
+                search.searchDispatcher = SearchDispatcher.create();
 
                 search.init();
 
@@ -23,20 +23,36 @@ Loader.add(
             init: function() {
                 var self = this;
                 $('#search > .search_type > .search_button').bind('click', function () {
-                    var $entries = $('#entries .entry');
+                    // var $entries = $('#entries .entry');
                     var $clickedButton = $(this);
+                    
+                    var $hiddenInput = $clickedButton.prev();
+                    var searchType = $hiddenInput.val();
 
-                    // var $searchField = $clickedButton.prev('.search_text');
-                    var $searchField = $clickedButton.prev().prev();
-                    var search = $searchField.val();
-                    var $label = $searchField.prev('label');
-                    var type = $label.text().replace(':', '');
-                    var cssClass = '.' + type + '_type';
-                    var searchCss = self.searchCss.create(cssClass);
-                    var searchConfiguration = self.searchConfig.create(search, searchCss);
+                    var searchConfig = {};
+                    
+                    // var multiSearch = false;
+                    
+                    switch (searchType) {
+                        case 'search_dance':
+                            // multiSearch = true;
+                            searchConfig = self.createDanceSearchConfiguration(
+                                $clickedButton
+                            );
+                            break;
+                        case 'search_number':
+                            searchConfig = self.createNumberSearchConfiguration(
+                                $clickedButton
+                            );
+                            break;
+                        default:
+                            console.error("search '"+searchType+"'strategy is not implemented");
+                    }
 
-                    // add entries to keep
-                    self.addEntriesToHide($entries, self.entriesHidden, searchConfiguration);
+                    var searchStrategy = self.searchDispatcher.dispatch(searchType, searchConfig);
+                    var $entriesToHide = searchStrategy.find();
+                    self.entriesHidden.mergeEntriesToHide($entriesToHide);
+                    // self.addEntriesToHide($entries, self.entriesHidden, searchConfiguration);
                     self.hideEntries();
                 });
                 $('#search > .reset_button').bind('click', function () {
@@ -45,47 +61,41 @@ Loader.add(
                 });
             },
 
-            addEntriesToKeep: function($entries, entriesObj, searchConfigurationObj) {
-                var hideEntries;
-                $entries.each(function () {
-                    var $danceType = $(this).find(searchConfigurationObj.getSearchCss().getCssClass());
-                    var danceFound = false;
-                    $danceType.each(function () {
-                        var text = $(this).text();
-                        if (searchConfigurationObj.getSearchText() === text) {
-                            danceFound = true;
-                            hideEntries = true;
-                        }
-                    });
-                    if (danceFound) {
-                        entriesObj.addEntriesToKeep($(this));
-                    }
-                });
+            createDanceSearchConfiguration: function ($clickedButton) {
+                var textToSearch = $clickedButton.parents('.search_type').find('input:checkbox').filter(function (key, el) {
+                    var $el = $(el);
+                    return $el.prop('checked');
+                }).map(function (key, el) {
+                    var $el = $(el);
+                    return $el.val();
+                }).toArray();
+                var cssClassToSearch = '.dance_type';
+                this.searchConfig.initSearchConfig(textToSearch, cssClassToSearch);
+                return this.searchConfig;
             },
 
-            addEntriesToHide: function($entries, entriesObj, searchConfigurationObj) {
-                var hideEntries;
-                $entries.each(function () {
-                    var $danceType = $(this).find(searchConfigurationObj.getSearchCss().getCssClass());
-                    var danceFound = false;
-                    $danceType.each(function () {
-                        var text = $(this).text();
-                        if (searchConfigurationObj.getSearchText() === text) {
-                            danceFound = true;
-                            hideEntries = true;
-                        }
-                    });
-                    if (!danceFound) {
-                        entriesObj.addEntriesToHide($(this));
-                    }
-                });
+            createNumberSearchConfiguration: function ($clickedButton, searchConfiguration) {
+                var $searchField = $clickedButton.parents('.search_type').find('.search_text');
+                var textToSearch = $searchField.val();
+                var cssClassToSearch = '#person .number_type';
+                this.searchConfig.initSearchConfig(textToSearch, cssClassToSearch);
+                return this.searchConfig;
             },
+
+            // addEntriesToHide: function($entries, entriesObj, searchConfigurationObj) {
+            //     var hideEntries;
+            //     $entries.each(function () {
+            //         var $entriesMatch = entriesObj.entriesToHide;
+            //        
+            //         entriesObj.addEntriesToHide($(this));
+            //     });
+            // },
 
             showEntries: function () {
                 if (this.entriesHidden.areEntriesToHide()) {
                     var entriesToHide = this.entriesHidden.getEntriesToHide();
                     for (var i in entriesToHide) {
-                        var $div = entriesToHide[i];
+                        var $div = $(entriesToHide[i]);
                         $div.show();
                     }
                 }
@@ -99,7 +109,7 @@ Loader.add(
                 if (this.entriesHidden.areEntriesToHide()) {
                     var entriesToHide = this.entriesHidden.getEntriesToHide();
                     for (var i in entriesToHide) {
-                        var $div = entriesToHide[i];
+                        var $div = $(entriesToHide[i]);
                         $div.hide();
                     }
                 }

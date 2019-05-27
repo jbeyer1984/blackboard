@@ -1,34 +1,36 @@
-Loader.add(
+Loader.define(
     '/public/js/src/SearchConfig.js',
     ["jQuery"],
     function ($, undefined) {
         var SearchConfig = {
-            create: function (searchTextArg, SearchCssObj) {
-                var searchConfiguration = Object.create(this);
-
-                searchConfiguration.searchText = searchTextArg;
-                searchConfiguration.searchCssObj = SearchCssObj;
-
-                return searchConfiguration;
+            textToSearch: '',
+            cssClassToSearch: '',
+            create: function () {
+                 var searchConfig = Object.create(this);
+                 
+                 return searchConfig;
             },
-
-            getSearchText: function () {
-                return this.searchText;
+            initSearchConfig : function(textToSearch, cssClassToSearch) {
+                this.textToSearch = textToSearch;
+                this.cssClassToSearch = cssClassToSearch;
             },
-
-            getSearchCss: function () {
-                return this.searchCssObj;
+            
+            getTextToSearch : function() {
+                return this.textToSearch;
+            },
+            getCssClassToSearch : function() {
+                return this.cssClassToSearch;
             }
 
             // return {
             //     create: create,
             //     getSearchText: getSearchText,
-            //     getSearchCss: getSearchCss
+            //     getSearchCssObj: getSearchCssObj
             // }
         };
         
         console.log("loaded inner SearchConfig.js");
         
-        return SearchConfig;
+        return SearchConfig.create();
     }
 );
